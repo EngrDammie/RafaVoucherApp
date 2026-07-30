@@ -147,10 +147,15 @@
     
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-        <p>App Developed By <a href="https://dammieoptimus.github.io/tgrstartnow/?d=eyJyZWYiOiJEYW1taWVPcHRpbXVzMiIsIm5hbWUiOiJEYW1taWUgKE9wdGltdXMpIEF5b2RlbGUiLCJwaG9uZSI6IjA4MDI4OTc1ODE2IiwicGljIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9xcVVFNGFyLmpwZyJ9" target="_blank" rel="noopener" class="font-semibold text-indigo-500 hover:text-indigo-700 transition-colors duration-300">Dammie Optimus Solutions</a>. &copy; <span id="copyright-year"></span> All rights reserved.</p>
+        <p>App Developed By <a href="https://dammieoptimus.github.io/tgrstartnow/?d=eyJyZWYiOiJEYW1taWVPcHRpbXVzMiIsIm5hbWUiOiJEYW1taWUgKE9wdGltdXMpIEF5b2RlbGUiLCJwaG9uZSI6IjA4MDI4OTc1ODE2IiwicGljIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9xcVVFNGFyLmpwZyJ9" target="_blank" rel="noopener" class="font-semibold text-indigo-500 hover:text-indigo-700 transition-colors duration-300">Dammie Optimus Solutions</a>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.0.1</span></p>
     </footer>
 
     <script>
+        // ── APP VERSION ──
+        // Bump this on every push. Follow semver: major.minor.patch
+        // major = breaking change, minor = new feature, patch = bug fix / small tweak
+        const APP_VERSION = '1.0.1';
+
         // ── STATE ──
         let savedAnchorDate = localStorage.getItem('anchorDate') || null;
         let missedDays = JSON.parse(localStorage.getItem('missedDays')) || [];
@@ -507,8 +512,9 @@
 
         document.getElementById('reset-btn').onclick = resetData;
 
-        // ── COPYRIGHT YEAR ──
+        // ── COPYRIGHT YEAR & VERSION ──
         document.getElementById('copyright-year').textContent = new Date().getFullYear();
+        document.getElementById('app-version').textContent = 'v' + APP_VERSION;
 
         // ── INIT ──
         if (savedAnchorDate) {
