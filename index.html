@@ -308,13 +308,14 @@
                 const isFuture = currentDate > today;
 
                 const dayEl = document.createElement('button');
+                dayEl.type = 'button';
+                dayEl.dataset.date = fullDateString;
                 let classes = 'aspect-square flex flex-col items-center justify-center rounded-xl border transition font-bold text-lg sm:text-xl relative overflow-hidden';
                 let inner = '';
 
                 if (!shiftInfo) {
-                    classes += cl(' bg-white border-gray-200 shadow-sm', ' bg-gray-800 border-gray-700 shadow-sm');
+                    classes += cl(' bg-white border-gray-200 shadow-sm cursor-pointer', ' bg-gray-800 border-gray-700 shadow-sm cursor-pointer');
                     inner = String(dayOfMonth);
-                    dayEl.onclick = null;
                 } else if (isFuture) {
                     classes += cl(
                         ' border-gray-100 text-gray-300 bg-gray-50/50 shadow-none cursor-default',
@@ -327,7 +328,6 @@
                     } else {
                         inner += `<span class="text-[0.5rem] font-bold uppercase tracking-widest mt-0.5 ${spanCls}">OFF</span>`;
                     }
-                    dayEl.onclick = null;
                 } else {
                     const isMissed = missedDays.includes(fullDateString);
 
@@ -344,27 +344,6 @@
                         classes += ` ${shiftInfo.color} hover:shadow-md`;
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.6rem] font-bold uppercase tracking-widest mt-1 opacity-80">${shiftInfo.label}</span>`;
                     }
-
-                    dayEl.onclick = function () {
-                        if (isSettingCycle) {
-                            localStorage.setItem('anchorDate', fullDateString);
-                            savedAnchorDate = fullDateString;
-                            isSettingCycle = false;
-                            document.getElementById('set-cycle-btn').innerText = 'Change Cycle Start';
-                            document.getElementById('set-cycle-btn').classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
-                            renderCalendar();
-                        } else {
-                            if (shiftInfo.label === 'OFF') return;
-
-                            if (missedDays.includes(fullDateString)) {
-                                missedDays = missedDays.filter(day => day !== fullDateString);
-                            } else {
-                                missedDays.push(fullDateString);
-                            }
-                            localStorage.setItem('missedDays', JSON.stringify(missedDays));
-                            renderCalendar();
-                        }
-                    };
                 }
 
                 dayEl.className = classes;
@@ -391,6 +370,37 @@
                 btn.classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
             }
         }
+
+        // ── EVENT DELEGATION ──
+        document.getElementById('calendar-grid').onclick = function (e) {
+            const btn = e.target.closest('button[data-date]');
+            if (!btn) return;
+
+            const date = btn.dataset.date;
+            const dt = new Date(date + 'T00:00:00');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            if (dt > today) return;
+
+            if (isSettingCycle) {
+                localStorage.setItem('anchorDate', date);
+                savedAnchorDate = date;
+                isSettingCycle = false;
+                document.getElementById('set-cycle-btn').innerText = 'Change Cycle Start';
+                document.getElementById('set-cycle-btn').classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
+                renderCalendar();
+            } else {
+                const shift = getShiftInfo(dt);
+                if (!shift || shift.label === 'OFF') return;
+
+                if (missedDays.includes(date)) {
+                    missedDays = missedDays.filter(d => d !== date);
+                } else {
+                    missedDays.push(date);
+                }
+                localStorage.setItem('missedDays', JSON.stringify(missedDays));
+                renderCalendar();
+            }
+        };
 
         // ── EXPORT ──
         function exportData() {
