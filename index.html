@@ -80,6 +80,24 @@
             65%  { opacity: 1; }
             100% { opacity: 0; transform: scale(1.8); }
         }
+        .anchor-popup, .unmissed-popup {
+            position: fixed; display: flex; align-items: center; justify-content: center;
+            pointer-events: none; z-index: 100;
+            font-weight: 900; font-size: 1rem; letter-spacing: 0.05em;
+            -webkit-text-stroke: 2px white; paint-order: stroke fill;
+            text-shadow: 0 0 14px rgba(255,255,255,0.5);
+            transform-origin: center center;
+            animation: anchorZoomFade 1s ease-out forwards;
+        }
+        .anchor-popup { color: #22c55e; }
+        .unmissed-popup { color: #22c55e; }
+        @keyframes anchorZoomFade {
+            0%   { opacity: 0; transform: scale(0.3); }
+            15%  { opacity: 1; transform: scale(1.3); }
+            35%  { transform: scale(1); }
+            65%  { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.6); }
+        }
         [data-theme="dark"] #help-modal .max-w-lg { background-color: #111827 !important; border: 1px solid #1f2937; }
         [data-theme="dark"] #help-modal .px-6.py-5 { background-color: #111827 !important; }
         [data-theme="dark"] #help-modal .px-6.py-4.bg-gray-50 { background-color: rgba(31,41,55,0.5) !important; border-color: #1f2937 !important; }
@@ -111,7 +129,7 @@
         <div class="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-5 sm:p-8 text-white text-center rounded-b-[2.5rem] shadow-lg overflow-hidden">
             
             <!-- TOP LEFT CONTROLS -->
-            <button id="theme-toggle" class="absolute top-4 left-4 z-10 w-14 h-7 rounded-full flex items-center px-1 bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 transition-all duration-300" title="Toggle theme">
+            <button id="theme-toggle" class="absolute top-4 left-4 z-10 w-14 h-7 rounded-full flex items-center px-1 bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 transition-all duration-300" title="Toggle theme" aria-label="Toggle dark mode">
                 <span id="theme-toggle-knob" class="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-xs transition-all duration-300">
                     <span id="theme-toggle-icon">☀️</span>
                 </span>
@@ -119,25 +137,27 @@
             
             <!-- TOP RIGHT CONTROLS -->
             <div class="absolute top-4 right-4 z-10">
-                <button id="help-btn" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 hover:scale-110 transition-all duration-300 text-white font-bold text-sm shadow-sm" title="How to use this app">?</button>
+                <button id="help-btn" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 hover:scale-110 transition-all duration-300 text-white font-bold text-sm shadow-sm" title="How to use this app" aria-label="Open help guide">?</button>
             </div>
             
             
             <p class="text-sm font-semibold uppercase tracking-wider opacity-80 mb-1">Voucher Period</p>
             
             <div class="flex items-center justify-center gap-3">
-                <button id="prev-period-btn" class="text-white/60 hover:text-white transition text-2xl leading-none font-bold" title="Previous period">&larr;</button>
+                <button id="prev-period-btn" class="text-white/60 hover:text-white transition text-2xl leading-none font-bold" title="Previous period" aria-label="Previous period">&larr;</button>
                 <h2 class="text-base sm:text-xl font-bold" id="voucher-date-range">July 20 - August 19</h2>
-                <button id="next-period-btn" class="text-white/60 hover:text-white transition text-2xl leading-none font-bold" title="Next period">&rarr;</button>
+                <button id="next-period-btn" class="text-white/60 hover:text-white transition text-2xl leading-none font-bold" title="Next period" aria-label="Next period">&rarr;</button>
             </div>
             
-            <p class="text-xs font-medium uppercase tracking-wider mt-1 opacity-60" id="period-label">Current Period</p>
+            <p class="text-xs font-medium uppercase tracking-wider mt-1 opacity-60" id="period-label" tabindex="0" role="button" aria-label="Tap for period summary">Current Period</p>
             
             <div class="flex justify-center items-baseline space-x-2 mt-5">
                 <span class="text-5xl sm:text-7xl font-bold tracking-tight" id="days-present-count">--</span>
                 <span class="text-sm sm:text-lg font-medium opacity-90">Days</span>
             </div>
             <p class="mt-2 text-indigo-100 font-medium tracking-wide">Total Days Present</p>
+            <p class="text-xs text-indigo-200/70 mt-0.5" id="attendance-pct"></p>
+            <p class="text-xs text-indigo-200/70 mt-0.5" id="streak-display"></p>
         </div>
 
         <!-- STATS ROW -->
@@ -156,26 +176,29 @@
         <!-- CALENDAR SECTION -->
         <div class="p-3 sm:p-6">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-gray-800">Attendance Grid</h3>
-                <button id="set-cycle-btn" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-full hover:bg-indigo-100 transition shadow-sm border border-indigo-100">
+                <h3 class="text-lg font-bold text-gray-800" id="calendar-heading">Attendance Grid</h3>
+                <button id="set-cycle-btn" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-full hover:bg-indigo-100 transition shadow-sm border border-indigo-100" aria-label="Set cycle start date">
                     Set Cycle Start
                 </button>
             </div>
             
-            <div id="calendar-grid" class="grid grid-cols-7 gap-[2px] sm:gap-1">
+            <div id="calendar-grid" class="grid grid-cols-7 gap-[2px] sm:gap-1" role="grid" aria-label="Attendance calendar">
             </div>
         </div>
         
         <!-- EXPORT / IMPORT / RESET SECTION -->
         <div class="p-3 sm:p-5 border-t border-gray-100 bg-gray-50 flex flex-col items-center gap-3">
             <div class="flex gap-2 justify-center">
-                <button id="export-btn" class="text-xs font-semibold text-indigo-600 bg-white px-4 py-2 rounded-full hover:bg-indigo-50 transition shadow-sm border border-indigo-200">
-                    Export Data
+                <button id="export-btn" class="text-xs font-semibold text-indigo-600 bg-white px-4 py-2 rounded-full hover:bg-indigo-50 transition shadow-sm border border-indigo-200" aria-label="Export data as JSON">
+                    Export JSON
                 </button>
-                <button id="import-btn" class="text-xs font-semibold text-indigo-600 bg-white px-4 py-2 rounded-full hover:bg-indigo-50 transition shadow-sm border border-indigo-200">
+                <button id="export-csv-btn" class="text-xs font-semibold text-indigo-600 bg-white px-4 py-2 rounded-full hover:bg-indigo-50 transition shadow-sm border border-indigo-200" aria-label="Export data as CSV">
+                    Export CSV
+                </button>
+                <button id="import-btn" class="text-xs font-semibold text-indigo-600 bg-white px-4 py-2 rounded-full hover:bg-indigo-50 transition shadow-sm border border-indigo-200" aria-label="Import data from file">
                     Import Data
                 </button>
-                <button id="reset-btn" class="text-xs font-semibold text-red-500 bg-white px-4 py-2 rounded-full hover:bg-red-50 transition shadow-sm border border-red-200">
+                <button id="reset-btn" class="text-xs font-semibold text-red-500 bg-white px-4 py-2 rounded-full hover:bg-red-50 transition shadow-sm border border-red-200" aria-label="Reset all attendance data">
                     Reset All
                 </button>
             </div>
@@ -186,7 +209,7 @@
     </div>
     
     <!-- HOW TO USE MODAL -->
-    <div id="help-modal" class="hidden fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-16 px-3 sm:px-4 pb-8 overflow-y-auto">
+    <div id="help-modal" class="hidden fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-16 px-3 sm:px-4 pb-8 overflow-y-auto" role="dialog" aria-modal="true" aria-label="How to use this app">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="help-backdrop"></div>
         <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10">
             
@@ -204,7 +227,7 @@
                 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">What Is This App?</h3>
-                    <p>This app helps you track your work attendance using a <strong>2-2-2 shift pattern</strong> &mdash; 2 morning shifts, 2 night shifts, then 2 days off. It repeats every 6 days. You can see which days you worked, mark when you missed a day, and view your attendance over each voucher period.</p>
+                    <p>This app helps you track your work attendance using a <strong>2-2-2 shift pattern</strong> &mdash; 2 morning shifts, 2 night shifts, then 2 days off. It repeats every 6 days. Mark when you miss a day, track your streak, view attendance percentage, navigate with swipe gestures, export data as JSON or CSV, and manage everything offline in your browser.</p>
                 </div>
 
                 <hr class="border-gray-100">
@@ -266,21 +289,24 @@
                     <p class="mb-2">The top of the app shows your attendance numbers for the current period:</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
                         <li><strong>Total Days Present</strong> &mdash; how many shifts you worked (not marked missed).</li>
+                        <li><strong>Attendance %</strong> &mdash; shown below the total as a percentage of present vs. total working days.</li>
+                        <li><strong>Streak</strong> &mdash; your consecutive present-day streak (backward from today), shown with a fire icon.</li>
                         <li><strong>Missed</strong> &mdash; how many shifts you missed (shown in red).</li>
                         <li><strong>Days Off</strong> &mdash; how many OFF days are in this period.</li>
                     </ul>
-                    <p class="mt-2 text-gray-500 italic">The big number at the top counts only the days you were present. It goes down when you mark a day as missed.</p>
+                    <p class="mt-2 text-gray-500 italic">You can also tap the period label to see a quick summary of M / N / OFF / Present / Missed counts for the current period.</p>
                 </div>
 
                 <hr class="border-gray-100">
                 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">5. Navigate Between Periods</h3>
-                    <p class="mb-2">Each voucher period is about one month. To move between periods:</p>
+                    <p class="mb-2">Each voucher period runs from the 20th of one month to the 19th of the next. To move between periods:</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
                         <li>Tap the <strong>left arrow (&larr;)</strong> to go to the <strong>previous</strong> period.</li>
                         <li>Tap the <strong>right arrow (&rarr;)</strong> to go to the <strong>next</strong> period.</li>
-                        <li>The label below tells you which period you are viewing.</li>
+                        <li><strong>Swipe left/right</strong> on the calendar grid to quickly change periods on mobile.</li>
+                        <li>Tap the <strong>period label</strong> (e.g. &quot;Current Period&quot;) to see a popup summary of shift counts.</li>
                     </ul>
                 </div>
 
@@ -288,10 +314,11 @@
                 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">6. Backup or Restore Your Data</h3>
-                    <p class="mb-2">At the bottom of the app, you will find three buttons:</p>
+                    <p class="mb-2">At the bottom of the app, you will find four buttons:</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
-                        <li><strong>Export Data</strong> &mdash; downloads a backup file with all your attendance records. Keep it somewhere safe.</li>
-                        <li><strong>Import Data</strong> &mdash; lets you restore your data from a backup file you exported earlier.</li>
+                        <li><strong>Export JSON</strong> &mdash; downloads a JSON backup file with all your attendance records.</li>
+                        <li><strong>Export CSV</strong> &mdash; downloads a spreadsheet-friendly CSV of every day&rsquo;s shift and status.</li>
+                        <li><strong>Import Data</strong> &mdash; lets you restore your data from a JSON backup file you exported earlier.</li>
                         <li><strong>Reset All</strong> &mdash; clears everything and starts fresh. Use this only if you are sure.</li>
                     </ul>
                     <p class="mt-2 text-gray-500 italic">Your data stays on your device. Nothing is sent to any server.</p>
@@ -300,14 +327,28 @@
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">7. Switch Between Light and Dark Mode</h3>
-                    <p class="mb-2">Tap the <strong>sun/moon button</strong> at the top-right corner of the app to switch between light and dark themes. Your choice is saved automatically.</p>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">7. Interactive &amp; Handy Features</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>Copy a date</strong> &mdash; double-tap any day button to copy its date (YYYY-MM-DD) to your clipboard.</li>
+                        <li><strong>Missed popup</strong> &mdash; when you mark a day missed, a &ldquo;MISSED&rdquo; animation flashes on that day.</li>
+                        <li><strong>Un-missed popup</strong> &mdash; tap a missed day again to clear it; a &ldquo;UNMISSED ✓&rdquo; animation appears.</li>
+                        <li><strong>Anchor flash</strong> &mdash; when you set or change your cycle start, an &ldquo;ANCHOR ✓&rdquo; animation confirms it.</li>
+                        <li><strong>Period tooltip</strong> &mdash; tap the period label to see a quick breakdown of all shift types.</li>
+                        <li><strong>Future days</strong> &mdash; are shown muted and cannot be tapped.</li>
+                    </ul>
                 </div>
 
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">8. Where Is My Data Saved?</h3>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">8. Switch Between Light and Dark Mode</h3>
+                    <p class="mb-2">Tap the <strong>sun/moon toggle</strong> at the top-left corner of the app to switch between light and dark themes. Your choice is saved automatically.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">9. Where Is My Data Saved?</h3>
                     <p>Everything you enter stays <strong>on your phone or computer</strong> in what is called &quot;local storage.&quot; No internet connection is needed, and no data is sent anywhere. If you clear your browser data or use a different device, your information will not be there &mdash; so make sure to <strong>export a backup</strong> if you need to switch devices.</p>
                 </div>
                 
@@ -322,7 +363,7 @@
 
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-        <p>App Developed By <a href="https://dammieoptimus.github.io/tgrstartnow/?d=eyJyZWYiOiJEYW1taWVPcHRpbXVzMiIsIm5hbWUiOiJEYW1taWUgKE9wdGltdXMpIEF5b2RlbGUiLCJwaG9uZSI6IjA4MDI4OTc1ODE2IiwicGljIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9xcVVFNGFyLmpwZyJ9" target="_blank" rel="noopener" class="font-semibold text-indigo-500 hover:text-indigo-700 transition-colors duration-300">Dammie Optimus Solutions</a>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.0.1</span></p>
+        <p>App Developed By <a href="https://dammieoptimus.github.io/tgrstartnow/?d=eyJyZWYiOiJEYW1taWVPcHRpbXVzMiIsIm5hbWUiOiJEYW1taWUgKE9wdGltdXMpIEF5b2RlbGUiLCJwaG9uZSI6IjA4MDI4OTc1ODE2IiwicGljIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9xcVVFNGFyLmpwZyJ9" target="_blank" rel="noopener" class="font-semibold text-indigo-500 hover:text-indigo-700 transition-colors duration-300">Dammie Optimus Solutions</a>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.2.0</span></p>
     </footer>
 
     <script>
@@ -442,7 +483,27 @@
             };
         }
 
-        // ── RENDER ──
+        // ── STREAK CALC ──
+        function calcStreak(startDate, endDate) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let streak = 0;
+            let d = new Date(endDate);
+            while (d >= startDate) {
+                if (d > today) { d.setDate(d.getDate() - 1); continue; }
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const ds = `${y}-${m}-${dd}`;
+                const shift = getShiftInfo(d);
+                if (!shift || shift.label === 'OFF') { d.setDate(d.getDate() - 1); continue; }
+                if (missedDays.includes(ds)) break;
+                streak++;
+                d.setDate(d.getDate() - 1);
+            }
+            return streak;
+        }
+
+            // ── RENDER ──
         function renderCalendar() {
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             updateDashboardHeader(startDate, endDate);
@@ -452,6 +513,11 @@
 
             const gridContainer = document.getElementById('calendar-grid');
             gridContainer.innerHTML = '';
+
+            // Month/year heading
+            const heading = document.getElementById('calendar-heading');
+            const monthYear = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            heading.textContent = savedAnchorDate ? `${monthYear} · Attendance` : 'Attendance Grid';
 
             const isDark = isDarkMode();
 
@@ -464,6 +530,21 @@
                 );
                 header.innerText = WEEKDAY_LABELS[i];
                 gridContainer.appendChild(header);
+            }
+
+            // Friendly banner when no anchor and not in cycle-setting mode
+            if (!savedAnchorDate && !isSettingCycle) {
+                const msg = document.createElement('div');
+                msg.id = 'friendly-banner';
+                msg.className = 'col-span-7 flex flex-col items-center justify-center py-10 text-gray-400 text-sm';
+                msg.innerHTML = '<span class="text-3xl mb-2">📋</span><span>Tap <strong>"Set Cycle Start"</strong> above,<br>then tap <strong>any day</strong> to begin!</span>';
+                gridContainer.appendChild(msg);
+                document.getElementById('days-present-count').innerText = '--';
+                document.getElementById('days-missed-count').innerText = '--';
+                document.getElementById('days-off-count').innerText = '--';
+                document.getElementById('attendance-pct').textContent = '';
+                document.getElementById('streak-display').textContent = '';
+                // Still fall through to render day buttons below the banner
             }
 
             const startDow = startDate.getDay();
@@ -537,26 +618,27 @@
                 document.getElementById('days-present-count').innerText = presentCount;
                 document.getElementById('days-missed-count').innerText = missedCount;
                 document.getElementById('days-off-count').innerText = offCount;
+                const totalWork = presentCount + missedCount;
+                const pct = totalWork > 0 ? Math.round(presentCount / totalWork * 100) : 0;
+                document.getElementById('attendance-pct').textContent = `${pct}% attendance`;
+                const streak = calcStreak(startDate, endDate);
+                document.getElementById('streak-display').textContent = streak > 0 ? `🔥 ${streak}-day streak` : '';
             } else {
                 document.getElementById('days-present-count').innerText = '--';
                 document.getElementById('days-missed-count').innerText = '--';
                 document.getElementById('days-off-count').innerText = '--';
+                document.getElementById('attendance-pct').textContent = '';
+                document.getElementById('streak-display').textContent = '';
             }
 
-            if (isSettingCycle) {
-                isSettingCycle = false;
-                const btn = document.getElementById('set-cycle-btn');
-                btn.innerText = savedAnchorDate ? 'Change Cycle Start' : 'Set Cycle Start';
-                btn.classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
-            }
         }
 
-        // ── MISSED ANIMATION ──
-        function showMissedPopup(btn) {
+        // ── POPUP ANIMATIONS ──
+        function showPopup(btn, text, className) {
             const rect = btn.getBoundingClientRect();
             const el = document.createElement('div');
-            el.className = 'missed-popup';
-            el.textContent = 'MISSED';
+            el.className = className;
+            el.textContent = text;
             el.style.left = rect.left + 'px';
             el.style.top = rect.top + 'px';
             el.style.width = rect.width + 'px';
@@ -564,6 +646,10 @@
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 1000);
         }
+
+        function showMissedPopup(btn) { showPopup(btn, 'MISSED', 'missed-popup'); }
+        function showAnchorPopup(btn) { showPopup(btn, 'ANCHOR ✓', 'anchor-popup'); }
+        function showUnmissedPopup(btn) { showPopup(btn, 'UNMISSED ✓', 'unmissed-popup'); }
 
         // ── EVENT DELEGATION ──
         document.getElementById('calendar-grid').onclick = function (e) {
@@ -582,12 +668,14 @@
                 document.getElementById('set-cycle-btn').innerText = 'Change Cycle Start';
                 document.getElementById('set-cycle-btn').classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
                 renderCalendar();
+                showAnchorPopup(btn);
             } else {
                 const shift = getShiftInfo(dt);
                 if (!shift || shift.label === 'OFF') return;
 
                 if (missedDays.includes(date)) {
                     missedDays = missedDays.filter(d => d !== date);
+                    showUnmissedPopup(btn);
                 } else {
                     missedDays.push(date);
                     showMissedPopup(btn);
@@ -596,6 +684,24 @@
                 renderCalendar();
             }
         };
+
+        // ── COPY DATE (double-tap / hold) ──
+        let lastTapTime = 0;
+        document.getElementById('calendar-grid').addEventListener('click', function (e) {
+            const btn = e.target.closest('button[data-date]');
+            if (!btn) return;
+            const now = Date.now();
+            if (now - lastTapTime < 400) {
+                const date = btn.dataset.date;
+                navigator.clipboard.writeText(date).catch(() => {});
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-xs z-50 shadow-lg';
+                toast.textContent = `Copied ${date}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            }
+            lastTapTime = now;
+        });
 
         // ── EXPORT ──
         function exportData() {
@@ -613,6 +719,21 @@
             a.click();
             URL.revokeObjectURL(url);
         }
+
+        // ── SWIPE GESTURE ──
+        (function () {
+            let sx = 0, ex = 0;
+            const grid = document.getElementById('calendar-grid');
+            grid.addEventListener('touchstart', function (e) { sx = e.changedTouches[0].screenX; }, { passive: true });
+            grid.addEventListener('touchend', function (e) {
+                ex = e.changedTouches[0].screenX;
+                const dx = ex - sx;
+                if (Math.abs(dx) > 60) {
+                    periodOffset += dx < 0 ? 1 : -1;
+                    renderCalendar();
+                }
+            }, { passive: true });
+        })();
 
         // ── IMPORT ──
         function importData(file) {
@@ -654,6 +775,38 @@
             reader.readAsText(file);
         }
 
+        // ── CSV EXPORT ──
+        function exportCSV() {
+            if (!savedAnchorDate) { alert('No data to export. Set a cycle start first.'); return; }
+            const { startDate, endDate } = getVoucherPeriod(periodOffset);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let csv = 'Date,Day,Shift,Status\n';
+            let d = new Date(startDate);
+            while (d <= endDate) {
+                if (d > today) { d.setDate(d.getDate() + 1); continue; }
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const ds = `${y}-${m}-${dd}`;
+                const shift = getShiftInfo(d);
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+                if (shift) {
+                    let status = shift.label === 'OFF' ? 'OFF' : missedDays.includes(ds) ? 'MISSED' : 'PRESENT';
+                    csv += `${ds},${dayName},${shift.label},${status}\n`;
+                } else {
+                    csv += `${ds},${dayName},--,--\n`;
+                }
+                d.setDate(d.getDate() + 1);
+            }
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voucher-attendance-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         // ── RESET ──
         function resetData() {
             if (confirm('Are you sure you want to reset ALL data? This cannot be undone.')) {
@@ -675,6 +828,8 @@
             isSettingCycle = true;
             this.innerText = 'Select Day Below...';
             this.classList.add('animate-pulse', 'bg-red-100', 'text-red-600');
+            const banner = document.getElementById('friendly-banner');
+            if (banner) banner.remove();
         };
 
         document.getElementById('prev-period-btn').onclick = function () {
@@ -689,6 +844,8 @@
 
         document.getElementById('export-btn').onclick = exportData;
 
+        document.getElementById('export-csv-btn').onclick = exportCSV;
+
         document.getElementById('import-btn').onclick = function () {
             document.getElementById('import-file-input').click();
         };
@@ -701,6 +858,40 @@
         };
 
         document.getElementById('reset-btn').onclick = resetData;
+
+        // ── PERIOD SUMMARY TOOLTIP ──
+        document.getElementById('period-label').onclick = function () {
+            if (!savedAnchorDate) return;
+            const { startDate, endDate } = getVoucherPeriod(periodOffset);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let m = 0, n = 0, off = 0, miss = 0, pres = 0;
+            let d = new Date(startDate);
+            while (d <= endDate) {
+                if (d > today) { d.setDate(d.getDate() + 1); continue; }
+                const y = d.getFullYear();
+                const mo = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const ds = `${y}-${mo}-${dd}`;
+                const shift = getShiftInfo(d);
+                if (shift) {
+                    if (shift.label === 'M') m++;
+                    else if (shift.label === 'N') n++;
+                    else off++;
+                    if (missedDays.includes(ds)) miss++;
+                    else if (shift.label !== 'OFF') pres++;
+                }
+                d.setDate(d.getDate() + 1);
+            }
+            const rect = this.getBoundingClientRect();
+            const tip = document.createElement('div');
+            tip.className = 'fixed z-50 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap';
+            const tipWidth = 240;
+            tip.style.left = Math.max(8, Math.min(rect.left + rect.width / 2 - tipWidth / 2, window.innerWidth - tipWidth - 8)) + 'px';
+            tip.style.top = (rect.bottom + 6) + 'px';
+            tip.innerHTML = `M:${m} &middot; N:${n} &middot; OFF:${off} &middot; Present:${pres} &middot; Missed:${miss}`;
+            document.body.appendChild(tip);
+            setTimeout(() => tip.remove(), 3000);
+        };
 
         // ── HELP MODAL ──
         function openHelp() {
