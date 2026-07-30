@@ -67,7 +67,9 @@
             pointer-events: none; z-index: 100;
             font-weight: 900; font-size: 1.4rem;
             color: #ef4444; letter-spacing: 0.1em;
-            text-shadow: 0 4px 12px rgba(239,68,68,0.5);
+            -webkit-text-stroke: 2px white;
+            paint-order: stroke fill;
+            text-shadow: 0 0 14px rgba(255,255,255,0.5);
             transform-origin: center center;
             animation: missedZoomFade 1s ease-out forwards;
         }
@@ -109,18 +111,19 @@
         <div class="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-5 sm:p-8 text-white text-center rounded-b-[2.5rem] shadow-lg overflow-hidden">
             
             <!-- TOP RIGHT CONTROLS -->
-            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <div class="absolute top-4 right-4 z-10">
+                <button id="help-btn" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 hover:scale-110 transition-all duration-300 text-white font-bold text-sm shadow-sm" title="How to use this app">?</button>
+            </div>
+            
+            
+            <div class="flex items-center justify-center gap-2 mb-1">
                 <button id="theme-toggle" class="w-14 h-7 rounded-full flex items-center px-1 bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 transition-all duration-300" title="Toggle theme">
                     <span id="theme-toggle-knob" class="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-xs transition-all duration-300">
                         <span id="theme-toggle-icon">☀️</span>
                     </span>
                 </button>
-                <button id="help-btn" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 hover:scale-110 transition-all duration-300 text-white font-bold text-sm shadow-sm" title="How to use this app">?</button>
+                <p class="text-sm font-semibold uppercase tracking-wider opacity-80">Voucher Period</p>
             </div>
-            
-            
-            
-            <p class="text-sm font-semibold uppercase tracking-wider opacity-80 mb-1">Voucher Period</p>
             
             <div class="flex items-center justify-center gap-3">
                 <button id="prev-period-btn" class="text-white/60 hover:text-white transition text-2xl leading-none font-bold" title="Previous period">&larr;</button>
