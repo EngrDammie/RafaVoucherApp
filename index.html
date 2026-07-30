@@ -33,12 +33,12 @@
         [data-theme="dark"] #reset-btn { background-color: #1f2937 !important; color: #f87171 !important; border-color: #991b1b !important; }
         [data-theme="dark"] #reset-btn:hover { background-color: #374151 !important; }
 
-        [data-theme="dark"] .bg-yellow-900\/40 { background-color: rgba(120, 119, 0, 0.4) !important; }
-        [data-theme="dark"] .text-yellow-400 { color: #fbbf24 !important; }
-        [data-theme="dark"] .border-yellow-700 { border-color: #a16207 !important; }
-        [data-theme="dark"] .bg-indigo-900\/40 { background-color: rgba(67, 56, 202, 0.4) !important; }
-        [data-theme="dark"] .text-indigo-400 { color: #818cf8 !important; }
-        [data-theme="dark"] .border-indigo-700 { border-color: #3730a3 !important; }
+        [data-theme="dark"] .bg-amber-900\/60 { background-color: rgba(120, 72, 0, 0.6) !important; }
+        [data-theme="dark"] .text-amber-300 { color: #fcd34d !important; }
+        [data-theme="dark"] .border-amber-600 { border-color: #d97706 !important; }
+        [data-theme="dark"] .bg-indigo-900\/60 { background-color: rgba(49, 46, 129, 0.6) !important; }
+        [data-theme="dark"] .text-indigo-300 { color: #a5b4fc !important; }
+        [data-theme="dark"] .border-indigo-600 { border-color: #4f46e5 !important; }
         [data-theme="dark"] .bg-gray-700 { background-color: #374151 !important; }
         [data-theme="dark"] .border-gray-600 { border-color: #4b5563 !important; }
         [data-theme="dark"] .bg-gray-800 { background-color: #1f2937 !important; }
@@ -55,6 +55,20 @@
         [data-theme="dark"] .brand-title { color: #e5e7eb !important; }
         .brand-subtitle { color: #9ca3af; }
         [data-theme="dark"] .brand-subtitle { color: #6b7280 !important; }
+        /* Modal */
+        #help-modal { scrollbar-width: thin; }
+        #help-modal .max-w-lg { animation: modalPop 0.2s ease-out; }
+        @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        [data-theme="dark"] #help-modal .max-w-lg { background-color: #111827 !important; border: 1px solid #1f2937; }
+        [data-theme="dark"] #help-modal .px-6.py-5 { background-color: #111827 !important; }
+        [data-theme="dark"] #help-modal .px-6.py-4.bg-gray-50 { background-color: rgba(31,41,55,0.5) !important; border-color: #1f2937 !important; }
+        [data-theme="dark"] #help-modal .text-gray-700 { color: #d1d5db !important; }
+        [data-theme="dark"] #help-modal .text-gray-600 { color: #9ca3af !important; }
+        [data-theme="dark"] #help-modal hr { border-color: #1f2937 !important; }
+        [data-theme="dark"] #help-modal .text-amber-800 { color: #fcd34d !important; }
+        [data-theme="dark"] #help-modal .text-indigo-800 { color: #a5b4fc !important; }
+        [data-theme="dark"] #help-modal .text-gray-500 { color: #6b7280 !important; }
+        [data-theme="dark"] #help-modal .text-red-700 { color: #fca5a5 !important; }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen pt-6 sm:pt-8 px-2 sm:px-4 bg-gray-100">
@@ -75,12 +89,16 @@
         <!-- DASHBOARD SECTION -->
         <div class="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-5 sm:p-8 text-white text-center rounded-b-[2.5rem] shadow-lg overflow-hidden">
             
-            <!-- THEME TOGGLE -->
-            <button id="theme-toggle" class="absolute top-4 right-4 w-14 h-7 rounded-full flex items-center px-1 bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 transition-all duration-300 z-10" title="Toggle theme">
-                <span id="theme-toggle-knob" class="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-xs transition-all duration-300">
-                    <span id="theme-toggle-icon">☀️</span>
-                </span>
-            </button>
+            <!-- TOP RIGHT CONTROLS -->
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button id="help-btn" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 hover:scale-110 transition-all duration-300 text-white font-bold text-sm shadow-sm" title="How to use this app">?</button>
+                <button id="theme-toggle" class="w-14 h-7 rounded-full flex items-center px-1 bg-white/20 backdrop-blur-sm border border-white/15 hover:bg-white/30 transition-all duration-300" title="Toggle theme">
+                    <span id="theme-toggle-knob" class="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-xs transition-all duration-300">
+                        <span id="theme-toggle-icon">☀️</span>
+                    </span>
+                </button>
+            </div>
+            
             
             
             <p class="text-sm font-semibold uppercase tracking-wider opacity-80 mb-1">Voucher Period</p>
@@ -145,6 +163,141 @@
         
     </div>
     
+    <!-- HOW TO USE MODAL -->
+    <div id="help-modal" class="hidden fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-16 px-3 sm:px-4 pb-8 overflow-y-auto">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="help-backdrop"></div>
+        <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10">
+            
+            <!-- Header -->
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 px-6 py-5 text-white">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold tracking-tight">How to Use This App</h2>
+                    <button id="help-close" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition text-lg font-bold">&times;</button>
+                </div>
+                <p class="text-sm text-indigo-100 mt-1">Everything you need to know in one place</p>
+            </div>
+            
+            <!-- Content -->
+            <div class="px-6 py-5 space-y-5 text-sm text-gray-700 max-h-[70vh] overflow-y-auto">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">What Is This App?</h3>
+                    <p>This app helps you track your work attendance using a <strong>2-2-2 shift pattern</strong> &mdash; 2 morning shifts, 2 night shifts, then 2 days off. It repeats every 6 days. You can see which days you worked, mark when you missed a day, and view your attendance over each voucher period.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">1. Set Your Start Date</h3>
+                    <p class="mb-2">Before anything else, you need to tell the app <strong>when your cycle begins</strong>.</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li>Tap the <strong>&quot;Set Cycle Start&quot;</strong> button above the calendar.</li>
+                        <li>The button will change to <strong>&quot;Select Day Below...&quot;</strong>.</li>
+                        <li>Now tap any day on the calendar &mdash; that day becomes your <strong>anchor date</strong>.</li>
+                        <li>The calendar will instantly color-code every day based on your shift pattern.</li>
+                    </ul>
+                    <p class="mt-2 text-gray-500 italic">You can change your start date anytime by tapping &quot;Change Cycle Start.&quot;</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">2. Understand the Colors</h3>
+                    <p class="mb-2">Each day on the calendar is color-coded so you can see your schedule at a glance:</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-block w-10 h-10 rounded-lg bg-amber-200 border-2 border-amber-400 shadow-sm"></span>
+                            <div><span class="font-bold text-amber-800">M (Morning)</span> &mdash; <span class="text-gray-600">You work the morning shift</span></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="inline-block w-10 h-10 rounded-lg bg-indigo-200 border-2 border-indigo-400 shadow-sm"></span>
+                            <div><span class="font-bold text-indigo-800">N (Night)</span> &mdash; <span class="text-gray-600">You work the night shift</span></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="inline-block w-10 h-10 rounded-lg bg-gray-100 border-2 border-gray-300"></span>
+                            <div><span class="font-bold text-gray-500">OFF</span> &mdash; <span class="text-gray-600">You are off duty</span></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="inline-block w-10 h-10 rounded-lg bg-red-500 border-2 border-red-600 ring-2 ring-red-300"></span>
+                            <div><span class="font-bold text-red-700">MISSED</span> &mdash; <span class="text-gray-600">You marked yourself absent</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">3. Mark Missed Days</h3>
+                    <p class="mb-2">If you missed a morning or night shift, you can mark it on the calendar:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>Tap</strong> any M (Morning) or N (Night) day to mark it as <strong>Missed</strong>.</li>
+                        <li>The day will turn <strong>bold red</strong> so you can see it clearly.</li>
+                        <li>Tap it <strong>again</strong> to remove the missed mark.</li>
+                        <li>You <strong>cannot</strong> mark OFF days as missed &mdash; days off are already rest days.</li>
+                    </ul>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">4. Read Your Stats</h3>
+                    <p class="mb-2">The top of the app shows your attendance numbers for the current period:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>Total Days Present</strong> &mdash; how many shifts you worked (not marked missed).</li>
+                        <li><strong>Missed</strong> &mdash; how many shifts you missed (shown in red).</li>
+                        <li><strong>Days Off</strong> &mdash; how many OFF days are in this period.</li>
+                    </ul>
+                    <p class="mt-2 text-gray-500 italic">The big number at the top counts only the days you were present. It goes down when you mark a day as missed.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">5. Navigate Between Periods</h3>
+                    <p class="mb-2">Each voucher period is about one month. To move between periods:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li>Tap the <strong>left arrow (&larr;)</strong> to go to the <strong>previous</strong> period.</li>
+                        <li>Tap the <strong>right arrow (&rarr;)</strong> to go to the <strong>next</strong> period.</li>
+                        <li>The label below tells you which period you are viewing.</li>
+                    </ul>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">6. Backup or Restore Your Data</h3>
+                    <p class="mb-2">At the bottom of the app, you will find three buttons:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>Export Data</strong> &mdash; downloads a backup file with all your attendance records. Keep it somewhere safe.</li>
+                        <li><strong>Import Data</strong> &mdash; lets you restore your data from a backup file you exported earlier.</li>
+                        <li><strong>Reset All</strong> &mdash; clears everything and starts fresh. Use this only if you are sure.</li>
+                    </ul>
+                    <p class="mt-2 text-gray-500 italic">Your data stays on your device. Nothing is sent to any server.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">7. Switch Between Light and Dark Mode</h3>
+                    <p class="mb-2">Tap the <strong>sun/moon button</strong> at the top-right corner of the app to switch between light and dark themes. Your choice is saved automatically.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">8. Where Is My Data Saved?</h3>
+                    <p>Everything you enter stays <strong>on your phone or computer</strong> in what is called &quot;local storage.&quot; No internet connection is needed, and no data is sent anywhere. If you clear your browser data or use a different device, your information will not be there &mdash; so make sure to <strong>export a backup</strong> if you need to switch devices.</p>
+                </div>
+                
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 text-center">
+                <button id="help-got-it" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-2.5 rounded-full transition shadow-md">Got It!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
         <p>App Developed By <a href="https://dammieoptimus.github.io/tgrstartnow/?d=eyJyZWYiOiJEYW1taWVPcHRpbXVzMiIsIm5hbWUiOiJEYW1taWUgKE9wdGltdXMpIEF5b2RlbGUiLCJwaG9uZSI6IjA4MDI4OTc1ODE2IiwicGljIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9xcVVFNGFyLmpwZyJ9" target="_blank" rel="noopener" class="font-semibold text-indigo-500 hover:text-indigo-700 transition-colors duration-300">Dammie Optimus Solutions</a>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.0.1</span></p>
@@ -154,7 +307,7 @@
         // ── APP VERSION ──
         // Bump this on every push. Follow semver: major.minor.patch
         // major = breaking change, minor = new feature, patch = bug fix / small tweak
-        const APP_VERSION = '1.1.0';
+        const APP_VERSION = '1.2.0';
 
         // ── STATE ──
         let savedAnchorDate = localStorage.getItem('anchorDate') || null;
@@ -255,15 +408,15 @@
 
             if (cycleDay === 0 || cycleDay === 1) return {
                 label: 'M',
-                color: cl('bg-yellow-50 text-yellow-700 border-yellow-200', 'bg-yellow-900/40 text-yellow-400 border-yellow-700')
+                color: cl('bg-amber-200 text-amber-800 border-amber-400 shadow-sm', 'bg-amber-900/60 text-amber-300 border-amber-600 shadow-sm')
             };
             if (cycleDay === 2 || cycleDay === 3) return {
                 label: 'N',
-                color: cl('bg-indigo-50 text-indigo-700 border-indigo-200', 'bg-indigo-900/40 text-indigo-400 border-indigo-700')
+                color: cl('bg-indigo-200 text-indigo-800 border-indigo-400 shadow-sm', 'bg-indigo-900/60 text-indigo-300 border-indigo-600 shadow-sm')
             };
             if (cycleDay === 4 || cycleDay === 5) return {
                 label: 'OFF',
-                color: cl('bg-gray-100 text-gray-400 border-gray-200 opacity-60', 'bg-gray-700 text-gray-400 border-gray-600 opacity-60')
+                color: cl('bg-gray-100 text-gray-500 border-gray-300', 'bg-gray-700 text-gray-400 border-gray-600')
             };
         }
 
@@ -315,7 +468,7 @@
                 const dayEl = document.createElement('button');
                 dayEl.type = 'button';
                 dayEl.dataset.date = fullDateString;
-                let classes = 'flex flex-col items-center justify-center rounded-lg sm:rounded-xl border transition font-bold relative overflow-hidden min-h-[2.5rem] sm:min-h-[3.5rem] px-0.5 py-1 sm:px-1.5 sm:py-2 text-[0.65rem] sm:text-lg lg:text-xl';
+                let classes = 'flex flex-col items-center justify-center rounded-xl border-2 sm:border-2 transition font-bold relative overflow-hidden min-h-[2.8rem] sm:min-h-[4rem] lg:min-h-[4.5rem] px-1 py-1 sm:px-2 sm:py-2 text-[0.75rem] sm:text-xl lg:text-2xl shadow-sm';
                 let inner = '';
 
                 if (!shiftInfo) {
@@ -329,9 +482,9 @@
                     const spanCls = cl('text-gray-300', 'text-gray-600');
                     inner = `<span>${dayOfMonth}</span>`;
                     if (shiftInfo.label !== 'OFF') {
-                        inner += `<span class="text-[0.35rem] sm:text-[0.45rem] lg:text-[0.5rem] font-bold uppercase tracking-widest mt-0.5 ${spanCls}">${shiftInfo.label}</span>`;
+                        inner += `<span class="text-[0.4rem] sm:text-[0.5rem] lg:text-[0.55rem] font-bold uppercase tracking-widest mt-0.5 ${spanCls}">${shiftInfo.label}</span>`;
                     } else {
-                        inner += `<span class="text-[0.35rem] sm:text-[0.45rem] lg:text-[0.5rem] font-bold uppercase tracking-widest mt-0.5 ${spanCls}">OFF</span>`;
+                        inner += `<span class="text-[0.4rem] sm:text-[0.5rem] lg:text-[0.55rem] font-bold uppercase tracking-widest mt-0.5 ${spanCls}">OFF</span>`;
                     }
                 } else {
                     const isMissed = missedDays.includes(fullDateString);
@@ -339,15 +492,15 @@
                     if (shiftInfo.label === 'OFF') {
                         offCount++;
                         classes += ` ${shiftInfo.color}`;
-                        inner = `<span>${dayOfMonth}</span><span class="text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1 opacity-80">OFF</span>`;
+                        inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">OFF</span>`;
                     } else if (isMissed) {
                         missedCount++;
-                        classes += ' bg-red-500 text-white border-red-600 scale-95 shadow-md';
-                        inner = `<span>${dayOfMonth}</span><span class="text-[0.35rem] sm:text-[0.5rem] lg:text-[0.55rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1 opacity-90">MISSED</span>`;
+                        classes += ' bg-red-500 text-white border-red-600 shadow-md ring-2 ring-red-300';
+                        inner = `<span>${dayOfMonth}</span><span class="text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">MISSED</span>`;
                     } else {
                         presentCount++;
-                        classes += ` ${shiftInfo.color} hover:shadow-md`;
-                        inner = `<span>${dayOfMonth}</span><span class="text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1 opacity-80">${shiftInfo.label}</span>`;
+                        classes += ` ${shiftInfo.color} hover:shadow-lg hover:-translate-y-0.5`;
+                        inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">${shiftInfo.label}</span>`;
                     }
                 }
 
@@ -511,6 +664,20 @@
         };
 
         document.getElementById('reset-btn').onclick = resetData;
+
+        // ── HELP MODAL ──
+        function openHelp() {
+            document.getElementById('help-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeHelp() {
+            document.getElementById('help-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('help-btn').onclick = openHelp;
+        document.getElementById('help-close').onclick = closeHelp;
+        document.getElementById('help-got-it').onclick = closeHelp;
+        document.getElementById('help-backdrop').onclick = closeHelp;
 
         // ── COPYRIGHT YEAR & VERSION ──
         document.getElementById('copyright-year').textContent = new Date().getFullYear();
