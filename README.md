@@ -20,6 +20,8 @@ A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. 
 - **Missed / Un-missed Popups** — Animated MISSED (red) and UNMISSED ✓ (green) feedback on tap.
 - **Copy Date** — Double-tap any day button to copy its YYYY-MM-DD date to your clipboard.
 - **Export / Import / Reset** — Export as JSON or CSV, import JSON backups, or reset all data.
+- **Help Attention** — On first visit, the help button pulses with a hint bubble until the guide is opened once.
+- **WhatsApp Contact** — One-tap WhatsApp link in the footer for support.
 - **Dark Mode** — Toggle at the top-left corner; persisted across sessions.
 - **Accessibility** — ARIA labels, roles, and semantic HTML for screen readers.
 - **Fully Responsive** — Works on phones, tablets, and desktops.
@@ -89,6 +91,7 @@ All state is saved in your browser's `localStorage`:
 | `anchorDate`  | `string` (`YYYY-MM-DD`)     | The cycle-start day that drives shift labels. |
 | `missedDays`  | `JSON` array of date strings| Days the user marked as missed.               |
 | `theme`       | `"light"` or `"dark"`       | User's theme preference.                      |
+| `helpIntroSeen`| `"1"` (set once)           | Marks that the help guide has been opened once.|
 
 > Clearing browser storage / cookies resets the app to first-run state. Export a backup before doing so.
 
@@ -126,6 +129,8 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 | Navigate periods              | Arrow buttons or swipe left/right on the grid.   |
 | View period summary           | Tap the period label below the date range.       |
 | Copy a date                   | Double-tap any day button.                       |
+| Open the help guide           | Tap the `?` button (pulses on first visit).      |
+| Contact support               | Tap the WhatsApp number in the footer.           |
 | Toggle dark mode              | Sun/moon toggle at top-left corner.              |
 | Export data                   | **Export JSON** or **Export CSV** at the bottom. |
 | Import data                   | **Import Data** → select a `.json` backup file.  |
@@ -152,6 +157,8 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 - ✅ Accessibility (ARIA labels, roles, semantic HTML)
 - ✅ Responsive design (mobile / tablet / desktop)
 - ✅ Help guide modal
+- ✅ Help attention (first-visit pulse + hint bubble)
+- ✅ WhatsApp support link
 
 ### Known Limitations
 
@@ -184,3 +191,5 @@ MIT License — free to use, copy, modify, and distribute.
 ## 👤 Author
 
 **Engr. Dammie** — [github.com/EngrDammie](https://github.com/EngrDammie)
+
+Need help? Chat with the team on **WhatsApp**: [0705 333 1253](https://wa.me/2347053331253)
