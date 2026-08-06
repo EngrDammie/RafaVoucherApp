@@ -1,6 +1,6 @@
 # 📅 RafaVoucherApp
 
-A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage your 2-2-2 shift schedule, mark missed days, track streaks, view attendance percentages, and export data — all offline, in your browser, with no backend or sign-up.
+A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage any shift schedule (2-2-2 by default, but fully customizable), mark missed days, track streaks, view attendance percentages, and export data — all offline, in your browser, with no backend or sign-up.
 
 > **Live demo:** open `index.html` in any modern browser. No install, no build step.
 
@@ -9,7 +9,9 @@ A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. 
 ## ✨ Features
 
 - **Monthly Voucher Period** — Automatically detects the current period (20th–19th) based on today's date.
-- **2-2-2 Shift Cycle** — Repeating 6-day rotation: 2 Morning (M), 2 Night (N), 2 Off (OFF).
+- **Customizable Shift Patterns** — Works with any repeating schedule (2-2-2 default, or presets like 3M/4OFF, 5M/2OFF, 1-1-1, or a fully custom pattern built chip by chip).
+- **Mid-Period Pattern Switching** — Change your pattern from any chosen date; days before it keep their old pattern, so history is never rewritten.
+- **Live Pattern Preview** — See the first 14 days of a new pattern before you save it.
 - **Configurable Anchor Date** — Tap any day as your cycle start; the entire calendar recomputes instantly.
 - **One-Tap Missed-Day Toggle** — Tap any M/N day to mark it missed (red). Tap again to unmark (green confirmation popup).
 - **Attendance Percentage** — See your present vs. total-working-day percentage below the main counter.
@@ -90,6 +92,7 @@ All state is saved in your browser's `localStorage`:
 |--------------|-----------------------------|-----------------------------------------------|
 | `anchorDate`  | `string` (`YYYY-MM-DD`)     | The cycle-start day that drives shift labels. |
 | `missedDays`  | `JSON` array of date strings| Days the user marked as missed.               |
+| `shiftSegments`| `JSON` array of segments   | `[{startDate, pattern:[{label, work, night, color}]}]` — every pattern switch adds a dated segment. |
 | `theme`       | `"light"` or `"dark"`       | User's theme preference.                      |
 | `helpIntroSeen`| `"1"` (set once)           | Marks that the help guide has been opened once.|
 
@@ -103,10 +106,10 @@ All state is saved in your browser's `localStorage`:
 Computes a start date (20th of the current or previous month) and end date (19th of the following month) based on today. If today is before the 20th, the period is the previous month's 20th → this month's 19th.
 
 ### Shift Engine (`getShiftInfo`)
-Calculates the difference in days between the anchor date and the target date, takes `diff % 6`, and maps:
-- `0` or `1` → **M** (Morning), amber
-- `2` or `3` → **N** (Night), indigo
-- `4` or `5` → **OFF**, gray
+Patterns are stored as data — each entry has a label plus `work` / `night` / `color` flags, so any repeating schedule works. Segments are `{startDate, pattern}` pairs (the first segment's start is the anchor date). For any target date, the engine picks the most recent segment whose start date is on or before it, then walks the pattern via modulo indexing: `((diffDays % len) + len) % len`. Dates before the first segment wrap backward around the first pattern. Changing your pattern simply appends a new dated segment — history is never rewritten.
+
+### Pattern Editor
+Tap **Shift Pattern** to open the editor: choose a preset or build a custom pattern with `+ M` / `+ N` / `+ OFF` chips (tap a chip to remove it), pick the start date, check the live 14-day preview, then save. A saved switch applies from the chosen date onward (future dates allowed).
 
 ### Streak Calculation (`calcStreak`)
 Walks backward from the period end date (or today, whichever is earlier), skipping OFF days and stopping at the first missed day, counting consecutive present days.
@@ -124,6 +127,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 | Action                        | How                                             |
 |-------------------------------|--------------------------------------------------|
 | Set / change cycle start      | Tap **Set Cycle Start**, then tap a day.         |
+| Change your shift pattern     | Tap **Shift Pattern**, build/select a pattern, pick a start date, Save. |
 | Mark a day missed             | Tap any M or N day. Red MISSED popup appears.    |
 | Unmark a missed day           | Tap the red day again. Green UNMISSED ✓ popup.   |
 | Navigate periods              | Arrow buttons or swipe left/right on the grid.   |
@@ -142,6 +146,8 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 
 - ✅ Voucher period (20th → 19th) auto-detection
 - ✅ 2-2-2 shift engine with configurable anchor
+- ✅ Customizable shift patterns (presets + chip builder + live preview)
+- ✅ Mid-period pattern switching via dated segments
 - ✅ Missed-day toggling with red highlighting
 - ✅ Dashboard counters (present, missed, off)
 - ✅ Attendance percentage and streak counter
@@ -162,7 +168,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 
 ### Known Limitations
 
-- The 2-2-2 cycle, anchor-based calculation, and voucher period boundaries are hard-coded.
+- Shift labels are currently M / N / OFF only — custom labels and night-shift pay multipliers are planned.
 - `missedDays` entries persist across periods — they are not automatically cleaned up (but unused entries have no visible effect in periods where they don't fall within the date range).
 - Future days are rendered but not clickable.
 - CSV export only covers the currently viewed period.
