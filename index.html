@@ -222,7 +222,7 @@
             <div class="bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 text-white px-5 py-4">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-[0.6rem] uppercase tracking-widest opacity-80 font-semibold">Payment Received</p>
+                        <p class="text-[0.6rem] uppercase tracking-widest opacity-80 font-semibold">Payment for previous voucher</p>
                         <p class="text-xl sm:text-2xl font-bold tracking-tight" id="paid-summary-amount">₦0.00</p>
                         <p class="text-xs opacity-90 mt-0.5" id="paid-summary-period">Voucher</p>
                     </div>
@@ -231,7 +231,7 @@
                         <p class="text-[0.55rem] uppercase tracking-widest opacity-90">days to pay</p>
                     </div>
                 </div>
-                <p class="text-[0.6rem] opacity-75 mt-2">Counting stopped for this voucher period</p>
+                <p class="text-[0.6rem] opacity-75 mt-2">Paid for the previous voucher period</p>
             </div>
         </div>
 
@@ -410,12 +410,12 @@
                 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">8. Record When You Get Paid</h3>
-                    <p class="mb-2">For each voucher period you can record the day you were paid and the amount received. Counting stops for that period from the paid day onward.</p>
+                    <p class="mb-2">Your company always pays you <strong>for the previous voucher period</strong>, during the next voucher period &mdash; so each voucher period has exactly one payment, and it is always for the period before it.</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
                         <li><strong>Tap any day</strong> to open the action dialog (its title is the current voucher period).</li>
-                        <li>Choose <strong>"Paid"</strong> &mdash; a dialog appears with a textbox for the amount (e.g. ₦82,850.43).</li>
-                        <li>Enter the amount and tap <strong>"Mark Paid"</strong> &mdash; the day turns green <strong>PAID</strong> and a summary card shows the amount, the voucher period, and how many <strong>days passed</strong> from the period start to your payment.</li>
-                        <li>Counting stops for that voucher period from the paid day onward, and the summary card is shown for any paid period you view.</li>
+                        <li>Choose <strong>"Paid"</strong> &mdash; a dialog appears (labelled for the <strong>previous voucher period</strong>) with a textbox for the amount (e.g. ₦82,850.43).</li>
+                        <li>Enter the amount and tap <strong>"Mark Paid"</strong> &mdash; the day turns green <strong>PAID</strong> and a summary card shows the amount, the <strong>previous voucher period</strong> it pays for, and how many <strong>days passed</strong> from the previous period&rsquo;s start to your payment.</li>
+                        <li>Counting stops for this voucher period from the paid day onward, and the summary card is shown for any paid period you view.</li>
                     </ul>
                     <p class="mt-2 text-gray-500 italic">A day already marked missed can still be marked Paid &mdash; the drop-down shows &ldquo;Unmiss&rdquo; and &ldquo;Paid&rdquo; together.</p>
                 </div>
@@ -460,7 +460,7 @@
 
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.5.0</span></p>
+        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.6.0</span></p>
         <p class="mt-1">Need help? Chat with us on WhatsApp:
             <a href="https://wa.me/2347053331253" target="_blank" rel="noopener" class="inline-flex items-center font-semibold text-indigo-500 hover:text-indigo-600 transition-colors duration-300" aria-label="Chat with us on WhatsApp">
                 <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -557,7 +557,7 @@
         <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl z-10 overflow-hidden">
             <div class="bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-4 text-white">
                 <h2 class="text-lg font-bold tracking-tight">Enter Payment Amount</h2>
-                <p class="text-xs text-emerald-100 mt-0.5" id="paid-amount-date">For the current voucher period</p>
+                <p class="text-xs text-emerald-100 mt-0.5" id="paid-amount-date">for the previous voucher period</p>
             </div>
             <div class="px-6 py-5 text-sm text-gray-700">
                 <label class="block text-xs font-bold uppercase tracking-wide text-gray-500 mb-2" for="paid-amount-input">Amount paid</label>
@@ -565,7 +565,7 @@
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₦</span>
                     <input type="number" id="paid-amount-input" min="0" step="0.01" placeholder="82,850.43" inputmode="decimal" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-400" aria-label="Amount paid in naira">
                 </div>
-                <p class="text-xs text-gray-400 mt-2">Counting stops for this voucher period and the day is marked <strong>PAID</strong>.</p>
+                <p class="text-xs text-gray-400 mt-2">This payment is for the <strong>previous voucher period</strong> &mdash; the day you record it is marked <strong>PAID</strong> in the current period.</p>
             </div>
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                 <button id="paid-amount-cancel" class="text-sm font-semibold text-gray-500 px-5 py-2 rounded-full hover:bg-gray-100 transition" aria-label="Cancel">Cancel</button>
@@ -578,7 +578,7 @@
         // ── APP VERSION ──
         // Bump this on every push. Follow semver: major.minor.patch
         // major = breaking change, minor = new feature, patch = bug fix / small tweak
-        const APP_VERSION = '1.5.0';
+        const APP_VERSION = '1.6.0';
 
         // ── SHIFT PATTERN CONSTANTS ──
         const SHIFT_COLORS = {
@@ -617,7 +617,8 @@
         let isSettingCycle = false;
         let periodOffset = 0;
 
-        // Paid days: [{ date: 'YYYY-MM-DD', amount: number }] — one per voucher period stops counting for that period.
+        // Paid days: [{ date: 'YYYY-MM-DD', amount: number }] — one payment per voucher
+        // period, recorded during period P and always FOR the previous period P-1.
         let paidDays = JSON.parse(localStorage.getItem('paidDays') || '[]');
         // State used by the day-action dialog flow.
         let actionDay = null;   // 'YYYY-MM-DD' of the day being acted on
@@ -798,7 +799,8 @@
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             updateDashboardHeader(startDate, endDate);
 
-            // If this voucher period is already paid, stop counting from the paid day onward.
+            // A payment recorded in this period (always for the PREVIOUS period) stops
+            // counting for this period from the paid day onward, and a green PAID day is shown.
             const paidForPeriod = getPaidForPeriod(startDate, endDate);
             const countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(endDate);
             const isPaidDay = (key) => paidForPeriod && paidForPeriod.date === key;
@@ -930,7 +932,10 @@
                 document.getElementById('streak-display').textContent = '';
             }
 
-            updatePaidSummary(startDate, endDate, paidForPeriod);
+            // Payment is always for the PREVIOUS voucher period, so the summary card
+            // reflects the period before the one currently being viewed.
+            const paidPeriod = getVoucherPeriod(periodOffset - 1);
+            updatePaidSummary(paidPeriod.startDate, paidPeriod.endDate, paidForPeriod);
 
         }
 
@@ -1059,8 +1064,9 @@
         // ── PAID AMOUNT DIALOG ──
         function openPaidAmountDialog() {
             if (!actionPeriod) return;
+            const prev = getVoucherPeriod(periodOffset - 1);
             document.getElementById('paid-amount-date').textContent =
-                `${rangeLabel(actionPeriod.start, actionPeriod.end)} Voucher`;
+                `for ${rangeLabel(prev.startDate, prev.endDate)} · the previous voucher period`;
             document.getElementById('paid-amount-input').value = '';
             document.getElementById('paid-amount-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -1086,16 +1092,21 @@
         }
 
         // ── PAID DAY SUMMARY ──
-        function updatePaidSummary(startDate, endDate, paidForPeriod) {
+        // The company pays during the current voucher period, but always for the
+        // PREVIOUS voucher period. So a payment recorded in viewed period P is for
+        // period P-1: the summary card shows P-1's date range and measures
+        // "days to pay" from P-1's start date up to the day the money arrived.
+        function updatePaidSummary(prevStartDate, prevEndDate, paidForPeriod) {
             const el = document.getElementById('paid-summary');
             if (!paidForPeriod) {
                 el.classList.add('hidden');
                 return;
             }
             document.getElementById('paid-summary-amount').textContent = formatNaira(paidForPeriod.amount);
-            document.getElementById('paid-summary-period').textContent = `Voucher: ${rangeLabel(startDate, endDate)}`;
+            document.getElementById('paid-summary-period').textContent =
+                `for ${rangeLabel(prevStartDate, prevEndDate)} · the previous voucher period`;
             const pd = new Date(paidForPeriod.date + 'T00:00:00');
-            const start = new Date(startDate); start.setHours(0, 0, 0, 0);
+            const start = new Date(prevStartDate); start.setHours(0, 0, 0, 0);
             const days = Math.round((pd - start) / 86400000);
             document.getElementById('paid-summary-days').textContent = days;
             el.classList.remove('hidden');

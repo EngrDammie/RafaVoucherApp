@@ -63,7 +63,7 @@ The logo is a single-path custom brand mark. Use it exactly:
 ### 2.4 Footer (OUTSIDE and BELOW the main card)
 ```html
 <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-  <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.5.0</span></p>
+  <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.6.0</span></p>
   <p class="mt-1">Need help? Chat with us on WhatsApp:
     <a href="https://wa.me/2347053331253" target="_blank" rel="noopener" class="inline-flex items-center font-semibold text-indigo-500 hover:text-indigo-600 transition-colors duration-300" aria-label="Chat with us on WhatsApp">
       [WhatsApp SVG icon, inline, 12x14px, `class="w-3.5 h-3.5 mr-1"`, standard WhatsApp chat-bubble path] 0705 333 1253
@@ -71,7 +71,7 @@ The logo is a single-path custom brand mark. Use it exactly:
   </p>
 </footer>
 ```
-JavaScript sets `#copyright-year` to the current year and `#app-version` to `'v' + APP_VERSION` on load (overwriting the static `v1.5.0`).
+JavaScript sets `#copyright-year` to the current year and `#app-version` to `'v' + APP_VERSION` on load (overwriting the static `v1.6.0`).
 
 ---
 
@@ -126,7 +126,7 @@ Hidden by default (`hidden` class). Shown by `updatePaidSummary` when the viewed
   <div class="bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 text-white px-5 py-4">
     <div class="flex items-center justify-between gap-3">
       <div>
-        <p class="text-[0.6rem] uppercase tracking-widest opacity-80 font-semibold">Payment Received</p>
+        <p class="text-[0.6rem] uppercase tracking-widest opacity-80 font-semibold">Payment for previous voucher</p>
         <p class="text-xl sm:text-2xl font-bold tracking-tight" id="paid-summary-amount">₦0.00</p>
         <p class="text-xs opacity-90 mt-0.5" id="paid-summary-period">Voucher</p>
       </div>
@@ -135,7 +135,7 @@ Hidden by default (`hidden` class). Shown by `updatePaidSummary` when the viewed
         <p class="text-[0.55rem] uppercase tracking-widest opacity-90">days to pay</p>
       </div>
     </div>
-    <p class="text-[0.6rem] opacity-75 mt-2">Counting stopped for this voucher period</p>
+    <p class="text-[0.6rem] opacity-75 mt-2">Paid for the previous voucher period</p>
   </div>
 </div>
 ```
@@ -362,8 +362,8 @@ Both new modals are fixed overlays: `hidden fixed inset-0 z-50 flex items-center
 
 ### 5.4 Paid-amount modal (`#paid-amount-modal`, `#paid-amount-backdrop`)
 Same overlay shell as §5.3.
-- Header: gradient `from-emerald-500 to-teal-600 px-6 py-4 text-white`; title **"Enter Payment Amount"**; `#paid-amount-date` (`text-xs text-emerald-100`, shows "Jul 20 – Aug 19, 2026 Voucher").
-- Body: label "Amount paid", a `<div class="relative">` with a `₦` prefix (`absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold`) and `<input type="number" id="paid-amount-input" min="0" step="0.01" placeholder="82,850.43" inputmode="decimal" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-400">`. Below: note "Counting stops for this voucher period and the day is marked PAID."
+- Header: gradient `from-emerald-500 to-teal-600 px-6 py-4 text-white`; title **"Enter Payment Amount"**; `#paid-amount-date` (`text-xs text-emerald-100`, shows "for Jul 20 – Aug 19 · the previous voucher period").
+- Body: label "Amount paid", a `<div class="relative">` with a `₦` prefix (`absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold`) and `<input type="number" id="paid-amount-input" min="0" step="0.01" placeholder="82,850.43" inputmode="decimal" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-400">`. Below: note "This payment is for the **previous voucher period** — the day you record it is marked **PAID** in the current period."
 - Footer: `#paid-amount-cancel` (**Cancel**) and `#paid-amount-submit` (`bg-emerald-600 hover:bg-emerald-700 ...` → **Mark Paid**).
 
 ---
@@ -378,8 +378,7 @@ let isSettingCycle = false;                                            // true w
 let periodOffset = 0;                                                  // 0 = current period, -1 = previous, 1 = next
 let shiftSegments = JSON.parse(localStorage.getItem('shiftSegments') || 'null'); // see 6.2
 let patternEditorPattern = [];                                         // working copy of labels in the editor, e.g. ['M','M','N','N','OFF','OFF']
-let paidDays = JSON.parse(localStorage.getItem('paidDays')) || [];     // array of {date:'YYYY-MM-DD', amount:number}
-let actionDay = null;                                                  // string 'YYYY-MM-DD' for the current day-action dialog
+let paidDays = JSON.parse(localStorage.getItem('paidDays')) || [];     // array of {date:'YYYY-MM-DD', amount:number}let actionDay = null;                                                  // string 'YYYY-MM-DD' for the current day-action dialog
 let actionBtn = null;                                                  // button element for the popup in day-action flow
 let actionPeriod = null;                                               // the current voucher period {start,end}
 ```
@@ -422,8 +421,7 @@ savedAnchorDate = shiftSegments.length ? shiftSegments[0].startDate : savedAncho
 | `anchorDate` | `'YYYY-MM-DD'` or `''` | setting anchor, importing, saving pattern, reset |
 | `missedDays` | JSON array of date strings | marking/unmarking missed, importing, reset |
 | `shiftSegments` | JSON array of segments | setting anchor, saving pattern, importing, reset |
-| `paidDays` | JSON array of `{date, amount}` | recording payment, importing, reset |
-| `theme` | `'light'` or `'dark'` | theme toggle, init, import |
+| `paidDays` | JSON array of `{date, amount}` | recording payment, importing, reset || `theme` | `'light'` or `'dark'` | theme toggle, init, import |
 | `helpIntroSeen` | `'1'` | first time help is opened |
 
 ---
@@ -431,7 +429,7 @@ savedAnchorDate = shiftSegments.length ? shiftSegments[0].startDate : savedAncho
 ## 7. CONSTANTS (verbatim)
 
 ```js
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 
 const SHIFT_COLORS = {
     amber:  { light: 'bg-amber-200 text-amber-800 border-amber-400 shadow-sm',      dark: 'bg-amber-900/60 text-amber-300 border-amber-600 shadow-sm' },
@@ -612,7 +610,7 @@ Clears `#calendar-grid` (`innerHTML = ''`), then:
 7. After the loop, update stats:
    - If anchor: `#days-present-count` = presentCount, `#days-missed-count` = missedCount, `#days-off-count` = offCount; `totalWork = presentCount + missedCount`; `pct = totalWork > 0 ? Math.round(presentCount / totalWork * 100) : 0`; `#attendance-pct` = `` `${pct}% attendance` ``; `streak = calcStreak(startDate, endDate)`; `#streak-display` = `streak > 0 ? \`🔥 ${streak}-day streak\` : ''`.
    - Else: all four displays reset to `--` / empty.
-8. Call `updatePaidSummary(startDate, endDate, paidForPeriod)` right after the stats block (all branches).
+8. Call `updatePaidSummary` right after the stats block (all branches), passing the **previous** period's dates — `const paidPeriod = getVoucherPeriod(periodOffset - 1); updatePaidSummary(paidPeriod.startDate, paidPeriod.endDate, paidForPeriod);`
 
 ### 8.6 Popup animations
 ```js
@@ -735,8 +733,9 @@ Dialog option rules (exact): if the day is already paid → only a single disabl
 ```js
 function openPaidAmountDialog() {
     if (!actionPeriod) return;
+    const prev = getVoucherPeriod(periodOffset - 1);
     document.getElementById('paid-amount-date').textContent =
-        `${rangeLabel(actionPeriod.start, actionPeriod.end)} Voucher`;
+        `for ${rangeLabel(prev.startDate, prev.endDate)} · the previous voucher period`;
     document.getElementById('paid-amount-input').value = '';
     document.getElementById('paid-amount-modal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -760,23 +759,31 @@ function submitPaidAmount() {
     renderCalendar();
 }
 ```
-Note: paid days are matched to a period via `getPaidForPeriod` by string comparison of date keys. Recording a payment on an already-paid day replaces the amount (no explicit unmark).
+Note: a payment recorded in the viewed period P is always **for the previous period P-1**. `getPaidForPeriod` matches payments to a period by string comparison of date keys (a payment counted in P is one whose `date` is within P). Recording a payment on an already-paid day replaces the amount (no explicit unmark).
 
 ### 8.7c Paid/paid summary render helpers
 ```js
-function updatePaidSummary(startDate, endDate, paidForPeriod) {
+// The summary card always reflects the PREVIOUS voucher period (P-1), because a
+// payment recorded in P pays P-1. "Days to pay" is measured from P-1's start.
+function updatePaidSummary(prevStartDate, prevEndDate, paidForPeriod) {
     const el = document.getElementById('paid-summary');
     if (!paidForPeriod) { el.classList.add('hidden'); return; }
     document.getElementById('paid-summary-amount').textContent = formatNaira(paidForPeriod.amount);
-    document.getElementById('paid-summary-period').textContent = `Voucher: ${rangeLabel(startDate, endDate)}`;
+    document.getElementById('paid-summary-period').textContent =
+        `for ${rangeLabel(prevStartDate, prevEndDate)} · the previous voucher period`;
     const pd = new Date(paidForPeriod.date + 'T00:00:00');
-    const start = new Date(startDate); start.setHours(0, 0, 0, 0);
-    const days = Math.round((pd - start) / 86400000);   // days from period start to paid day (0-based from start)
+    const start = new Date(prevStartDate); start.setHours(0, 0, 0, 0);
+    const days = Math.round((pd - start) / 86400000);   // days from the previous period's start to the pay day
     document.getElementById('paid-summary-days').textContent = days;
     el.classList.remove('hidden');
 }
 ```
-`updatePaidSummary(startDate, endDate, paidForPeriod)` is called at the end of `renderCalendar` (after the stats block, for all branches including the no-anchor `else`). `showPaidPopup(btn)` calls `showPopup(btn, 'PAID ✓', 'paid-popup')` before `renderCalendar()`.
+`updatePaidSummary` is called at the end of `renderCalendar` with the **previous** period's dates (all branches including the no-anchor `else`):
+```js
+const paidPeriod = getVoucherPeriod(periodOffset - 1);
+updatePaidSummary(paidPeriod.startDate, paidPeriod.endDate, paidForPeriod);
+```
+`showPaidPopup(btn)` calls `showPopup(btn, 'PAID ✓', 'paid-popup')` before `renderCalendar()`.
 
 ### 8.8 Dialog button wiring (all set via `onclick`)
 - `day-action-cancel`, `day-action-backdrop` → `closeDayDialog()`
@@ -963,11 +970,11 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 > - **Future days** &mdash; are shown muted and cannot be tapped.
 
 **8. Record When You Get Paid**
-> For each voucher period you can record the day you were paid and the amount received. Counting stops for that period from the paid day onward.
+> Your company always pays you **for the previous voucher period**, during the next voucher period &mdash; so each voucher period has exactly one payment, and it is always for the period before it.
 > - **Tap any day** to open the action dialog (its title is the current voucher period).
-> - Choose **"Paid"** &mdash; a dialog appears with a textbox for the amount (e.g. ₦82,850.43).
-> - Enter the amount and tap **"Mark Paid"** &mdash; the day turns green **PAID** and a summary card shows the amount, the voucher period, and how many **days passed** from the period start to your payment.
-> - Counting stops for that voucher period from the paid day onward, and the summary card is shown for any paid period you view.
+> - Choose **"Paid"** &mdash; a dialog appears (labelled for the **previous voucher period**) with a textbox for the amount (e.g. ₦82,850.43).
+> - Enter the amount and tap **"Mark Paid"** &mdash; the day turns green **PAID** and a summary card shows the amount, the **previous voucher period** it pays for, and how many **days passed** from the previous period&rsquo;s start to your payment.
+> - Counting stops for this voucher period from the paid day onward, and the summary card is shown for any paid period you view.
 > *A day already marked missed can still be marked Paid &mdash; the drop-down shows "Unmiss" and "Paid" together.*
 
 **9. Use Your Own Shift Pattern**
@@ -1027,7 +1034,7 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 15. Import validates every field before applying anything, and resets `periodOffset` to 0.
 16. A paid day renders green **PAID** and overrides the missed style. The paid-day branch increments **no** counter, so the paid day is excluded from the present/missed/off counts.
 17. When a period is paid, the present/missed/off counters, the period tooltip, and the paid summary stop at the paid day (days after it render but don't count). The **streak is NOT capped** — `calcStreak` still walks the whole period from the end date (skipping future/OFF, stopping at the first missed day).
-18. A period's payment is looked up by date range, so recording on any day within the period marks that period paid; re-recording on the same paid day replaces the amount.
+18. A payment recorded in the viewed period P is **always for the previous period P-1**. The summary card, the amount-dialog subtitle, and every label say "for the previous voucher period" (P-1's date range); days-to-pay is measured from P-1's start to the pay day. A period's payment is looked up by date range, so recording on any day within P marks P (as having received the previous period's pay); re-recording on the same paid day replaces the amount.
 19. A paid day's dialog offers only a disabled `Already paid · ₦X` option (no Missed/Unmiss/Copy/Paid).
 
 ---
@@ -1050,7 +1057,7 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 5. **Stats:** counters match the grid; attendance % correct; streak shows 🔥 when ≥1.
 6. **Navigation:** arrows + swipe change period; date range and label update; tooltip on label click shows `M:N:OFF:Present:Missed` counts (only to today, and capped at the paid day if that period is paid).
 7. **Copy:** tap a day → dialog → **Copy Date** → toast "Copied YYYY-MM-DD"; clipboard has the date.
-8. **Record payment:** tap a day → dialog → **Paid** → amount dialog shows the voucher period; enter an amount (e.g. 82850.43) → **Mark Paid** → day turns green **PAID** with a green `PAID ✓` popup; the paid summary card appears with `₦82,850.43`, the voucher period, and days-to-pay; **counting stops** at that day (present/missed/off counts freeze). Opening that paid day's dialog again shows a single disabled `Already paid · ₦X` option. Navigating to a different (unpaid) period hides the summary.
+8. **Record payment:** tap a day → dialog → **Paid** → amount dialog subtitle shows the **previous voucher period** range ("for Jul 20 – Aug 19 · the previous voucher period"); enter an amount (e.g. 82850.43) → **Mark Paid** → day turns green **PAID** with a green `PAID ✓` popup; the paid summary card appears with `₦82,850.43`, the **previous period** range (e.g. "for Jul 20 – Aug 19 · the previous voucher period"), and days-to-pay from that previous period's start; **counting stops** at that day (present/missed/off counts freeze). Opening that paid day's dialog again shows a single disabled `Already paid · ₦X` option. Navigating to a different (unpaid) period hides the summary.
 9. **Pattern editor:** opens with current pattern prefilled; presets replace chips; + M/N/OFF append; chip click removes; Delete last / Clear work; preview shows 14 chips starting at the chosen date; changing the date re-previews.
 10. **Save pattern:** today as start → calendar updates from today (old days unchanged); future start → future days show the new labels; `PATTERN SAVED ✓` popup. Validate: no date → `PICK A DATE`; empty → `PATTERN IS EMPTY`; date before anchor → `TOO EARLY`; no anchor → `SET CYCLE START FIRST` popup on the Shift Pattern button.
 11. **Export JSON:** file contains anchorDate, missedDays, shiftSegments, paidDays, theme, exportedAt.
@@ -1068,4 +1075,4 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 - Output exactly **one file**: `index.html`. Do not create a README, CSS, or JS file.
 - Keep the exact element IDs listed here — the JavaScript depends on them.
 - Reproduce the WhatsApp icon with the standard WhatsApp brand SVG path (chat bubble glyph), `viewBox="0 0 24 24"`, `fill="currentColor"`, rendered at `w-3.5 h-3.5`.
-- The app must be a faithful clone of **v1.5.0** of the original. Do not add features beyond this spec, do not remove any.
+- The app must be a faithful clone of **v1.6.0** of the original. Do not add features beyond this spec, do not remove any.

@@ -1,6 +1,6 @@
 # 📅 RafaVoucherApp
 
-A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage any shift schedule (2-2-2 by default, but fully customizable), mark missed days, track streaks, view attendance percentages, record your payment per voucher period, and export data — all offline, in your browser, with no backend or sign-up.
+A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage any shift schedule (2-2-2 by default, but fully customizable), mark missed days, track streaks, view attendance percentages, record the payment you receive (always for the previous voucher period), and export data — all offline, in your browser, with no backend or sign-up.
 
 > **Live demo:** open `index.html` in any modern browser. No install, no build step.
 
@@ -14,7 +14,7 @@ A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. 
 - **Live Pattern Preview** — See the first 14 days of a new pattern before you save it.
 - **Configurable Anchor Date** — Tap any day as your cycle start; the entire calendar recomputes instantly.
 - **Day Action Dialog** — Tap any day to open an action dialog (titled with the current voucher period) with a drop-down: **Missed**, **Unmiss** (if already missed), **Paid**, or **Copy Date**.
-- **Record Payment (PAID)** — Choose **Paid** and enter the amount (e.g. ₦82,850.43). The day turns green **PAID**, counting stops for that voucher period, and a summary card shows the amount, the voucher period, and how many days passed from period start to payment.
+- **Record Payment (PAID)** — Your company always pays **for the previous voucher period** (one payment per period). Choose **Paid** and enter the amount (e.g. ₦82,850.43). The day turns green **PAID**, counting stops for that period, and a summary card shows the amount, the **previous voucher period** it pays for, and how many days passed from the previous period's start to payment.
 - **Attendance Percentage** — See your present vs. total-working-day percentage below the main counter.
 - **Present Streak Counter** — Consecutive present-day streak (backward from today) shown with a fire icon.
 - **Period Navigation** — Use arrow buttons or **swipe left/right** on the calendar grid.
@@ -94,7 +94,7 @@ All state is saved in your browser's `localStorage`:
 | `anchorDate`  | `string` (`YYYY-MM-DD`)     | The cycle-start day that drives shift labels. |
 | `missedDays`  | `JSON` array of date strings| Days the user marked as missed.               |
 | `shiftSegments`| `JSON` array of segments   | `[{startDate, pattern:[{label, work, night, color}]}]` — every pattern switch adds a dated segment. |
-| `paidDays`    | `JSON` array of payments  | `[{date:'YYYY-MM-DD', amount:number}]` — the day the user was paid for a voucher period. Stops counting for that period. |
+| `paidDays`    | `JSON` array of payments  | `[{date:'YYYY-MM-DD', amount:number}]` — the day the user was paid. One per voucher period, always **for the previous period**. |
 | `theme`       | `"light"` or `"dark"`       | User's theme preference.                      |
 | `helpIntroSeen`| `"1"` (set once)           | Marks that the help guide has been opened once.|
 
@@ -117,10 +117,10 @@ Tap **Shift Pattern** to open the editor: choose a preset or build a custom patt
 Walks backward from the period end date (or today, whichever is earlier), skipping OFF days and stopping at the first missed day, counting consecutive present days.
 
 ### Rendering (`renderCalendar`)
-Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. When a voucher period is paid, counting stops at the paid day (days after it still render but aren't counted), and a green **PAID** summary card shows the amount, the voucher period, and days-to-payment. The friendly banner is shown only when no anchor is set and the user is not in cycle-setting mode.
+Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. When a voucher period is paid, a green **PAID** summary card shows the amount, the **previous voucher period** it pays for, and days-to-payment (measured from the previous period's start to the pay day). The friendly banner is shown only when no anchor is set and the user is not in cycle-setting mode.
 
 ### Day Action Dialog
-A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle day clicks. Outside cycle-setting mode, tapping any past day opens the **Day Action** dialog titled with the current voucher period. Its drop-down offers **Missed** / **Unmiss** (if already missed) / **Paid** / **Copy Date**. Choosing **Paid** opens a second dialog to enter the amount; on submit the day is stored in `paidDays`, marked green **PAID**, and a `PAID ✓` popup fires. Copy date is handled inside this dialog (it replaced the old double-tap shortcut).
+A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle day clicks. Outside cycle-setting mode, tapping any past day opens the **Day Action** dialog titled with the current voucher period. Its drop-down offers **Missed** / **Unmiss** (if already missed) / **Paid** / **Copy Date**. Choosing **Paid** opens a second dialog to enter the amount (labelled as paying the **previous voucher period**); on submit the day is stored in `paidDays`, marked green **PAID**, and a `PAID ✓` popup fires. Copy date is handled inside this dialog (it replaced the old double-tap shortcut).
 
 ---
 
@@ -132,7 +132,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 | Change your shift pattern     | Tap **Shift Pattern**, build/select a pattern, pick a start date, Save. |
 | Mark a day missed             | Tap a day → dialog → **Missed**. Red MISSED popup. |
 | Unmark a missed day           | Tap the day → dialog → **Unmiss**. Green UNMISSED ✓ popup. |
-| Record payment                | Tap a day → dialog → **Paid** → enter amount → **Mark Paid**. Green PAID ✓ popup + summary card. |
+| Record payment                | Tap a day → dialog → **Paid** → enter amount → **Mark Paid**. Green PAID ✓ popup + summary card (shows the previous voucher period it pays for). |
 | Navigate periods              | Arrow buttons or swipe left/right on the grid.   |
 | View period summary           | Tap the period label below the date range.       |
 | Copy a date                   | Tap a day → dialog → **Copy Date**.              |
@@ -152,7 +152,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 - ✅ Customizable shift patterns (presets + chip builder + live preview)
 - ✅ Mid-period pattern switching via dated segments
 - ✅ Missed-day toggling with red highlighting (via day action dialog)
-- ✅ Paid-day tracking — record amount, mark PAID, stop counting, show days-to-payment summary
+- ✅ Paid-day tracking — record the amount (always **for the previous voucher period**), mark PAID, stop counting, show the previous period's days-to-payment summary
 - ✅ Dashboard counters (present, missed, off)
 - ✅ Attendance percentage and streak counter
 - ✅ Period navigation (previous / next)
@@ -173,7 +173,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 ### Known Limitations
 
 - Shift labels are currently M / N / OFF only — custom labels and night-shift pay multipliers are planned.
-- One paid record is kept per voucher period; re-recording payment on the same day updates the amount, but there is no explicit "unmark paid" action.
+- One paid record is kept per voucher period (always for the previous period); re-recording payment on the same day updates the amount, but there is no explicit "unmark paid" action.
 - `missedDays` entries persist across periods — they are not automatically cleaned up (but unused entries have no visible effect in periods where they don't fall within the date range).
 - Future days are rendered but not clickable.
 - CSV export only covers the currently viewed period.
