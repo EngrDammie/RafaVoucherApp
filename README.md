@@ -14,7 +14,7 @@ A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. 
 - **Live Pattern Preview** — See the first 14 days of a new pattern before you save it.
 - **Configurable Anchor Date** — Tap any day as your cycle start; the entire calendar recomputes instantly.
 - **Day Action Dialog** — Tap any day to open an action dialog (titled with the current voucher period) with a drop-down: **Missed**, **Unmiss** (if already missed), **Paid**, or **Copy Date**.
-- **Record Payment (PAID)** — Your company always pays **for the previous voucher period** (one payment per period). Choose **Paid** and enter the amount (e.g. ₦82,850.43). The day turns green **PAID**, counting stops for that period, and a summary card shows the amount, the **previous voucher period** it pays for, and how many days passed from the previous period's start to payment.
+- **Record Payment (PAID)** — Your company always pays **for the previous voucher period** (one payment per period). Choose **Paid** and enter the amount (e.g. ₦82,850.43). The day turns green **PAID** (a marker only — it never changes the current period's attendance), and a summary card shows the amount, the **previous voucher period** it pays for, and the **days-to-pay** count from the previous period's start up to (and including) the pay day.
 - **Attendance Percentage** — See your present vs. total-working-day percentage below the main counter.
 - **Present Streak Counter** — Consecutive present-day streak (backward from today) shown with a fire icon.
 - **Period Navigation** — Use arrow buttons or **swipe left/right** on the calendar grid.

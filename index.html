@@ -415,7 +415,7 @@
                         <li><strong>Tap any day</strong> to open the action dialog (its title is the current voucher period).</li>
                         <li>Choose <strong>"Paid"</strong> &mdash; a dialog appears (labelled for the <strong>previous voucher period</strong>) with a textbox for the amount (e.g. ₦82,850.43).</li>
                         <li>Enter the amount and tap <strong>"Mark Paid"</strong> &mdash; the day turns green <strong>PAID</strong> and a summary card shows the amount, the <strong>previous voucher period</strong> it pays for, and how many <strong>days passed</strong> from the previous period&rsquo;s start to your payment.</li>
-                        <li>Counting stops for this voucher period from the paid day onward, and the summary card is shown for any paid period you view.</li>
+                        <li>Recording a payment never changes your attendance for the current period &mdash; the day is just marked green <strong>PAID</strong>, and the summary card shows what it pays for and the <strong>days-to-pay</strong> count for that previous period.</li>
                     </ul>
                     <p class="mt-2 text-gray-500 italic">A day already marked missed can still be marked Paid &mdash; the drop-down shows &ldquo;Unmiss&rdquo; and &ldquo;Paid&rdquo; together.</p>
                 </div>
@@ -565,7 +565,7 @@
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₦</span>
                     <input type="number" id="paid-amount-input" min="0" step="0.01" placeholder="82,850.43" inputmode="decimal" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-400" aria-label="Amount paid in naira">
                 </div>
-                <p class="text-xs text-gray-400 mt-2">This payment is for the <strong>previous voucher period</strong> &mdash; the day you record it is marked <strong>PAID</strong> in the current period.</p>
+                <p class="text-xs text-gray-400 mt-2">This payment is for the <strong>previous voucher period</strong> &mdash; the day you record it is simply marked <strong>PAID</strong> in the current period. Your current period's attendance is <strong>not</strong> affected.</p>
             </div>
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                 <button id="paid-amount-cancel" class="text-sm font-semibold text-gray-500 px-5 py-2 rounded-full hover:bg-gray-100 transition" aria-label="Cancel">Cancel</button>
@@ -799,10 +799,10 @@
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             updateDashboardHeader(startDate, endDate);
 
-            // A payment recorded in this period (always for the PREVIOUS period) stops
-            // counting for this period from the paid day onward, and a green PAID day is shown.
+            // A payment recorded in this period pays the PREVIOUS period, so it never
+            // alters the current view's attendance counts. The recorded day is simply
+            // shown green as a PAID marker. paidForPeriod feeds the summary card.
             const paidForPeriod = getPaidForPeriod(startDate, endDate);
-            const countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(endDate);
             const isPaidDay = (key) => paidForPeriod && paidForPeriod.date === key;
 
             const today = new Date();
@@ -888,21 +888,25 @@
                     }
                 } else {
                     const isMissed = missedDays.includes(fullDateString);
-                    const shouldCount = fullDateString <= countEndKey;
 
+                    // Count every elapsed day normally — a payment (which is for the
+                    // PREVIOUS period) must not change the current period's attendance.
                     if (isPaidDay(fullDateString)) {
+                        if (!shiftInfo.work) offCount++;
+                        else if (isMissed) missedCount++;
+                        else presentCount++;
                         classes += ' bg-gradient-to-br from-emerald-400 to-green-600 text-white border-emerald-500 shadow-md ring-2 ring-emerald-200';
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">PAID</span>`;
                     } else if (!shiftInfo.work) {
-                        if (shouldCount) offCount++;
+                        offCount++;
                         classes += ` ${shiftInfo.color}`;
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">${shiftInfo.label}</span>`;
                     } else if (isMissed) {
-                        if (shouldCount) missedCount++;
+                        missedCount++;
                         classes += ' bg-red-500 text-white border-red-600 shadow-md ring-2 ring-red-300';
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">MISSED</span>`;
                     } else {
-                        if (shouldCount) presentCount++;
+                        presentCount++;
                         classes += ` ${shiftInfo.color} hover:shadow-lg hover:-translate-y-0.5`;
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">${shiftInfo.label}</span>`;
                     }
@@ -1107,7 +1111,7 @@
                 `for ${rangeLabel(prevStartDate, prevEndDate)} · the previous voucher period`;
             const pd = new Date(paidForPeriod.date + 'T00:00:00');
             const start = new Date(prevStartDate); start.setHours(0, 0, 0, 0);
-            const days = Math.round((pd - start) / 86400000);
+            const days = Math.round((pd - start) / 86400000) + 1; // inclusive of the pay day
             document.getElementById('paid-summary-days').textContent = days;
             el.classList.remove('hidden');
         }
@@ -1304,15 +1308,12 @@
             if (!savedAnchorDate) return;
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             const today = new Date(); today.setHours(0, 0, 0, 0);
-            const paidForPeriod = getPaidForPeriod(startDate, endDate);
-            const countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(today);
             const labelCounts = {};
             let miss = 0, pres = 0;
             let d = new Date(startDate);
             while (d <= endDate) {
                 if (d > today) { d.setDate(d.getDate() + 1); continue; }
                 const ds = keyOf(d);
-                if (ds > countEndKey) { d.setDate(d.getDate() + 1); continue; }
                 const shift = getShiftInfo(d);
                 if (shift) {
                     labelCounts[shift.label] = (labelCounts[shift.label] || 0) + 1;

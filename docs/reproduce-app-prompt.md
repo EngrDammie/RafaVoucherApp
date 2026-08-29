@@ -596,14 +596,14 @@ Clears `#calendar-grid` (`innerHTML = ''`), then:
 6. Day loop from `startDate` through `endDate` (inclusive). For each day:
    - `fullDateString` = `YYYY-MM-DD`.
    - `shiftInfo = getShiftInfo(currentDate)`; `isFuture = currentDate > today` (today normalized to midnight).
-   - Before the loop: `paidForPeriod = getPaidForPeriod(startDate, endDate)`; `countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(endDate)`; `isPaidDay(key) => paidForPeriod && paidForPeriod.date === key`. Each work/missed/off branch only increments its counter when `shouldCount = fullDateString <= countEndKey` (i.e. counting stops on the paid date).
+   - Before the loop: `paidForPeriod = getPaidForPeriod(startDate, endDate)`; `isPaidDay(key) => paidForPeriod && paidForPeriod.date === key`. A payment recorded in the viewed period pays the **previous** period, so it does **not** cap or change the current view's counters — every elapsed day is counted normally. A day that is `isPaidDay` still increments its normal counter (off/missed/present) but renders as a green **PAID** marker.
    - Each day is a `<button type="button">` with `data-date="YYYY-MM-DD"` and **base classes** (verbatim):
      ```
      flex flex-col items-center justify-center rounded-xl border-2 sm:border-2 transition font-bold relative overflow-hidden min-h-[2.8rem] sm:min-h-[4rem] lg:min-h-[4.5rem] px-1 py-1 sm:px-2 sm:py-2 text-[0.75rem] sm:text-xl lg:text-2xl shadow-sm
      ```
    - **No shift info** (`!shiftInfo`, i.e. no anchor): append ` bg-white border-gray-200 shadow-sm cursor-pointer` (light) or ` bg-gray-800 border-gray-700 shadow-sm cursor-pointer` (dark); content = day number only.
    - **Future day** (has shiftInfo): muted classes ` border-gray-100 text-gray-300 bg-gray-50/50 shadow-none cursor-default` (light) / ` border-gray-700 text-gray-600 bg-gray-800/30 shadow-none cursor-default` (dark). Content = day number + a small label line: if `shiftInfo.work` show `shiftInfo.label`, else show `OFF`. Label line classes: `text-[0.4rem] sm:text-[0.5rem] lg:text-[0.55rem] font-bold uppercase tracking-widest mt-0.5` plus muted text color.
-   - **Paid day** (`isPaidDay(fullDateString)`, checked first after no-shift/future): classes ` bg-gradient-to-br from-emerald-400 to-green-600 text-white border-emerald-500 shadow-md ring-2 ring-emerald-200`; content = day number + `PAID` line (`text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1`). It visually overrides missed. The paid branch increments **no** counter, so the paid day itself is excluded from the present/missed/off counts.
+   - **Paid day** (`isPaidDay(fullDateString)`, checked first after no-shift/future): classes ` bg-gradient-to-br from-emerald-400 to-green-600 text-white border-emerald-500 shadow-md ring-2 ring-emerald-200`; content = day number + `PAID` line (`text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1`). It visually overrides missed. The paid branch still increments its normal counter (off/missed/present) — it's a green marker only and does **not** change the current period's attendance.
    - **Past/today, OFF day** (`!shiftInfo.work`): increment `offCount` if `shouldCount`; append ` ${shiftInfo.color}`; content = day number + label line (`text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1`) with `shiftInfo.label`.
    - **Past/today, missed** (`missedDays.includes(fullDateString)`): increment `missedCount` if `shouldCount`; classes ` bg-red-500 text-white border-red-600 shadow-md ring-2 ring-red-300`; content = day number + `MISSED` line (`text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1`).
    - **Past/today, present work day**: increment `presentCount` if `shouldCount`; classes ` ${shiftInfo.color} hover:shadow-lg hover:-translate-y-0.5`; content = day number + label line with `shiftInfo.label`.
@@ -854,7 +854,7 @@ const data = {
 
 ### 8.14 Period summary tooltip (`#period-label` click)
 - Guard: no anchor → return silently.
-- Iterate the viewed period up to today **and up to the paid date if the period is paid** (`countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(today)`); count each shift label into a map (`labelCounts[label]++`); count `miss` (in missedDays) and `pres` (work days not missed).
+- Iterate the viewed period up to today (no paid-date cap — payments only pay the previous period): count each shift label into a map (`labelCounts[label]++`); count `miss` (in missedDays) and `pres` (work days not missed).
 - Build `parts = [label:count for each label]` then append `Present:${pres}` and `Missed:${miss}`.
 - Create a fixed tooltip div: `fixed z-50 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap`, `innerHTML = parts.join(' &middot; ')`, positioned below the label and clamped horizontally: `left = clamp(rect.left + rect.width/2 - 120, 8, innerWidth - 240 - 8)`, `top = rect.bottom + 6`. Remove after 3000 ms.
 
@@ -974,7 +974,7 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 > - **Tap any day** to open the action dialog (its title is the current voucher period).
 > - Choose **"Paid"** &mdash; a dialog appears (labelled for the **previous voucher period**) with a textbox for the amount (e.g. ₦82,850.43).
 > - Enter the amount and tap **"Mark Paid"** &mdash; the day turns green **PAID** and a summary card shows the amount, the **previous voucher period** it pays for, and how many **days passed** from the previous period&rsquo;s start to your payment.
-> - Counting stops for this voucher period from the paid day onward, and the summary card is shown for any paid period you view.
+> - Recording a payment never changes your attendance for the current period &mdash; the day is just marked green <strong>PAID</strong>, and the summary card shows what it pays for and the <strong>days-to-pay</strong> count for that previous period.
 > *A day already marked missed can still be marked Paid &mdash; the drop-down shows "Unmiss" and "Paid" together.*
 
 **9. Use Your Own Shift Pattern**
@@ -1032,9 +1032,9 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 13. The period tooltip and CSV only cover dates up to and including today.
 14. Theme persists; a saved theme overrides the OS preference.
 15. Import validates every field before applying anything, and resets `periodOffset` to 0.
-16. A paid day renders green **PAID** and overrides the missed style. The paid-day branch increments **no** counter, so the paid day is excluded from the present/missed/off counts.
-17. When a period is paid, the present/missed/off counters, the period tooltip, and the paid summary stop at the paid day (days after it render but don't count). The **streak is NOT capped** — `calcStreak` still walks the whole period from the end date (skipping future/OFF, stopping at the first missed day).
-18. A payment recorded in the viewed period P is **always for the previous period P-1**. The summary card, the amount-dialog subtitle, and every label say "for the previous voucher period" (P-1's date range); days-to-pay is measured from P-1's start to the pay day. A period's payment is looked up by date range, so recording on any day within P marks P (as having received the previous period's pay); re-recording on the same paid day replaces the amount.
+16. A paid day renders green **PAID** and overrides the missed style. It is a **visual marker only** — it still increments its normal counter (off/missed/present), so a payment never changes the current period's attendance.
+17. A payment does **not** cap the current view's attendance or tooltip — every elapsed day is counted. The paid summary card shows the **previous** period (P-1) it pays for and the **days-to-pay** counted inclusively (from P-1's start up to and including the pay day). The **streak is NOT capped** — `calcStreak` walks the whole period from the end date (skipping future/OFF, stopping at the first missed day).
+18. A payment recorded in the viewed period P is **always for the previous period P-1**. The summary card, the amount-dialog subtitle, and every label say "for the previous voucher period" (P-1's date range); days-to-pay is measured from P-1's start **to (and including)** the pay day. A period's payment is looked up by date range, so recording on any day within P marks P (as having received the previous period's pay); re-recording on the same paid day replaces the amount.
 19. A paid day's dialog offers only a disabled `Already paid · ₦X` option (no Missed/Unmiss/Copy/Paid).
 
 ---
@@ -1057,7 +1057,7 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 5. **Stats:** counters match the grid; attendance % correct; streak shows 🔥 when ≥1.
 6. **Navigation:** arrows + swipe change period; date range and label update; tooltip on label click shows `M:N:OFF:Present:Missed` counts (only to today, and capped at the paid day if that period is paid).
 7. **Copy:** tap a day → dialog → **Copy Date** → toast "Copied YYYY-MM-DD"; clipboard has the date.
-8. **Record payment:** tap a day → dialog → **Paid** → amount dialog subtitle shows the **previous voucher period** range ("for Jul 20 – Aug 19 · the previous voucher period"); enter an amount (e.g. 82850.43) → **Mark Paid** → day turns green **PAID** with a green `PAID ✓` popup; the paid summary card appears with `₦82,850.43`, the **previous period** range (e.g. "for Jul 20 – Aug 19 · the previous voucher period"), and days-to-pay from that previous period's start; **counting stops** at that day (present/missed/off counts freeze). Opening that paid day's dialog again shows a single disabled `Already paid · ₦X` option. Navigating to a different (unpaid) period hides the summary.
+8. **Record payment:** tap a day → dialog → **Paid** → amount dialog subtitle shows the **previous voucher period** range ("for Jul 20 – Aug 19 · the previous voucher period"); enter an amount (e.g. 82850.43) → **Mark Paid** → day turns green **PAID** with a green `PAID ✓` popup, but the current period's present/missed/off counts are **unchanged** (the paid day still counts normally); the paid summary card appears with `₦82,850.43`, the **previous period** range (e.g. "for Jul 20 – Aug 19 · the previous voucher period"), and days-to-pay counted **inclusive of the pay day** (e.g. 36 for pay on 24 Aug). Opening that paid day's dialog again shows a single disabled `Already paid · ₦X` option. Navigating to a different (unpaid) period hides the summary.
 9. **Pattern editor:** opens with current pattern prefilled; presets replace chips; + M/N/OFF append; chip click removes; Delete last / Clear work; preview shows 14 chips starting at the chosen date; changing the date re-previews.
 10. **Save pattern:** today as start → calendar updates from today (old days unchanged); future start → future days show the new labels; `PATTERN SAVED ✓` popup. Validate: no date → `PICK A DATE`; empty → `PATTERN IS EMPTY`; date before anchor → `TOO EARLY`; no anchor → `SET CYCLE START FIRST` popup on the Shift Pattern button.
 11. **Export JSON:** file contains anchorDate, missedDays, shiftSegments, paidDays, theme, exportedAt.
