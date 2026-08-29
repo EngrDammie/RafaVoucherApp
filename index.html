@@ -91,13 +91,38 @@
         }
         .anchor-popup { color: #22c55e; }
         .unmissed-popup { color: #22c55e; }
-        @keyframes anchorZoomFade {
-            0%   { opacity: 0; transform: scale(0.3); }
-            15%  { opacity: 1; transform: scale(1.3); }
-            35%  { transform: scale(1); }
-            65%  { opacity: 1; }
-            100% { opacity: 0; transform: scale(1.6); }
-        }
+@keyframes anchorZoomFade {
+    0%   { opacity: 0; transform: scale(0.3); }
+    15%  { opacity: 1; transform: scale(1.3); }
+    35%  { transform: scale(1); }
+    65%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.6); }
+}
+.paid-popup {
+    position: fixed; display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 100;
+    font-weight: 900; font-size: 1.3rem; letter-spacing: 0.08em;
+    color: #22c55e; -webkit-text-stroke: 2px white; paint-order: stroke fill;
+    text-shadow: 0 0 18px rgba(34,197,94,0.65);
+    transform-origin: center center;
+    animation: paidBounce 1.2s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes paidBounce {
+    0%   { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+    30%  { opacity: 1; transform: scale(1.35) rotate(4deg); }
+    50%  { transform: scale(0.95) rotate(0deg); }
+    70%  { transform: scale(1.12); }
+    85%  { transform: scale(1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+#paid-summary { animation: paidSummaryIn 0.5s ease-out; }
+@keyframes paidSummaryIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .paid-popup, #paid-summary { animation: none !important; }
+}
         /* Help button attention */
         .help-attention {
             animation: helpPulse 3.5s ease-in-out infinite;
@@ -192,6 +217,24 @@
             </div>
         </div>
 
+        <!-- PAID SUMMARY CARD -->
+        <div id="paid-summary" class="mx-3 sm:mx-5 mt-3 hidden rounded-2xl overflow-hidden shadow-lg">
+            <div class="bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 text-white px-5 py-4">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-[0.6rem] uppercase tracking-widest opacity-80 font-semibold">Payment Received</p>
+                        <p class="text-xl sm:text-2xl font-bold tracking-tight" id="paid-summary-amount">₦0.00</p>
+                        <p class="text-xs opacity-90 mt-0.5" id="paid-summary-period">Voucher</p>
+                    </div>
+                    <div class="text-center shrink-0 bg-white/15 rounded-2xl px-4 py-2">
+                        <p class="text-2xl font-bold" id="paid-summary-days">0</p>
+                        <p class="text-[0.55rem] uppercase tracking-widest opacity-90">days to pay</p>
+                    </div>
+                </div>
+                <p class="text-[0.6rem] opacity-75 mt-2">Counting stopped for this voucher period</p>
+            </div>
+        </div>
+
         <!-- CALENDAR SECTION -->
         <div class="p-3 sm:p-6">
             <div class="flex justify-between items-center mb-3 gap-2">
@@ -251,7 +294,7 @@
                 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">What Is This App?</h3>
-                    <p>This app helps you track your work attendance on a <strong>shift pattern</strong> &mdash; by default the classic <strong>2-2-2</strong> (2 morning shifts, 2 night shifts, then 2 days off, repeating every 6 days). You can keep that, or build any pattern you like (see section 8). Mark when you miss a day, track your streak, view attendance percentage, navigate with swipe gestures, export data as JSON or CSV, and manage everything offline in your browser.</p>
+                    <p>This app helps you track your work attendance on a <strong>shift pattern</strong> &mdash; by default the classic <strong>2-2-2</strong> (2 morning shifts, 2 night shifts, then 2 days off, repeating every 6 days). You can keep that, or build any pattern you like (see section 9). Mark when you miss a day, track your streak, view attendance percentage, navigate with swipe gestures, export data as JSON or CSV, and manage everything offline in your browser.</p>
                 </div>
 
                 <hr class="border-gray-100">
@@ -265,7 +308,7 @@
                         <li>Now tap any day on the calendar &mdash; that day becomes your <strong>anchor date</strong>.</li>
                         <li>The calendar will instantly color-code every day based on your shift pattern.</li>
                     </ul>
-                    <p class="mt-2 text-gray-500 italic">You can change your start date anytime by tapping &quot;Change Cycle Start.&quot; You can also switch to a different shift pattern anytime &mdash; see section 8.</p>
+                    <p class="mt-2 text-gray-500 italic">You can change your start date anytime by tapping &quot;Change Cycle Start.&quot; You can also switch to a different shift pattern anytime &mdash; see section 9.</p>
                 </div>
 
                 <hr class="border-gray-100">
@@ -299,10 +342,10 @@
                     <h3 class="font-bold text-indigo-600 text-base mb-1">3. Mark Missed Days</h3>
                     <p class="mb-2">If you missed a morning or night shift, you can mark it on the calendar:</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
-                        <li><strong>Tap</strong> any M (Morning) or N (Night) day to mark it as <strong>Missed</strong>.</li>
-                        <li>The day will turn <strong>bold red</strong> so you can see it clearly.</li>
-                        <li>Tap it <strong>again</strong> to remove the missed mark.</li>
-                        <li>You <strong>cannot</strong> mark OFF days as missed &mdash; days off are already rest days.</li>
+                        <li><strong>Tap</strong> any day to open an <strong>action dialog</strong> (its title is the current voucher period).</li>
+                        <li>Choose <strong>"Missed"</strong> from the drop-down to mark that day as missed &mdash; it turns <strong>bold red</strong>.</li>
+                        <li>If the day is already missed, the drop-down shows <strong>"Unmiss"</strong> &mdash; tap it to restore the day.</li>
+                        <li>OFF days cannot be marked missed &mdash; days off are already rest days.</li>
                     </ul>
                 </div>
 
@@ -353,10 +396,11 @@
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">7. Interactive &amp; Handy Features</h3>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
-                        <li><strong>Copy a date</strong> &mdash; double-tap any day button to copy its date (YYYY-MM-DD) to your clipboard.</li>
+                        <li><strong>Copy a date</strong> &mdash; open a day&rsquo;s action dialog and choose <strong>"Copy Date"</strong> to copy its YYYY-MM-DD to your clipboard.</li>
                         <li><strong>Missed popup</strong> &mdash; when you mark a day missed, a &ldquo;MISSED&rdquo; animation flashes on that day.</li>
-                        <li><strong>Un-missed popup</strong> &mdash; tap a missed day again to clear it; a &ldquo;UNMISSED ✓&rdquo; animation appears.</li>
+                        <li><strong>Un-missed popup</strong> &mdash; tap the missed day again to clear it; a &ldquo;UNMISSED ✓&rdquo; animation appears.</li>
                         <li><strong>Anchor flash</strong> &mdash; when you set or change your cycle start, an &ldquo;ANCHOR ✓&rdquo; animation confirms it.</li>
+                        <li><strong>PAID popup</strong> &mdash; when you record a payment, a green &ldquo;PAID ✓&rdquo; animation flashes on that day.</li>
                         <li><strong>Period tooltip</strong> &mdash; tap the period label to see a quick breakdown of all shift types.</li>
                         <li><strong>Future days</strong> &mdash; are shown muted and cannot be tapped.</li>
                     </ul>
@@ -365,7 +409,21 @@
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">8. Use Your Own Shift Pattern</h3>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">8. Record When You Get Paid</h3>
+                    <p class="mb-2">For each voucher period you can record the day you were paid and the amount received. Counting stops for that period from the paid day onward.</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>Tap any day</strong> to open the action dialog (its title is the current voucher period).</li>
+                        <li>Choose <strong>"Paid"</strong> &mdash; a dialog appears with a textbox for the amount (e.g. ₦82,850.43).</li>
+                        <li>Enter the amount and tap <strong>"Mark Paid"</strong> &mdash; the day turns green <strong>PAID</strong> and a summary card shows the amount, the voucher period, and how many <strong>days passed</strong> from the period start to your payment.</li>
+                        <li>Counting stops for that voucher period from the paid day onward, and the summary card is shown for any paid period you view.</li>
+                    </ul>
+                    <p class="mt-2 text-gray-500 italic">A day already marked missed can still be marked Paid &mdash; the drop-down shows &ldquo;Unmiss&rdquo; and &ldquo;Paid&rdquo; together.</p>
+                </div>
+
+                <hr class="border-gray-100">
+                
+                <div>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">9. Use Your Own Shift Pattern</h3>
                     <p class="mb-2">Don&rsquo;t work a 2-2-2? No problem &mdash; the app works with <strong>any</strong> repeating pattern. Tap <strong>&quot;Shift Pattern&quot;</strong> above the calendar to open the pattern editor.</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
                         <li><strong>Pick a preset</strong> &mdash; e.g. 3M / 4OFF, 5M / 2OFF, 1-1-1, or 4M / 2OFF.</li>
@@ -380,14 +438,14 @@
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">9. Switch Between Light and Dark Mode</h3>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">10. Switch Between Light and Dark Mode</h3>
                     <p class="mb-2">Tap the <strong>sun/moon toggle</strong> at the top-left corner of the app to switch between light and dark themes. Your choice is saved automatically.</p>
                 </div>
 
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">10. Where Is My Data Saved?</h3>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">11. Where Is My Data Saved?</h3>
                     <p>Everything you enter stays <strong>on your phone or computer</strong> in what is called &quot;local storage.&quot; No internet connection is needed, and no data is sent anywhere. If you clear your browser data or use a different device, your information will not be there &mdash; so make sure to <strong>export a backup</strong> if you need to switch devices.</p>
                 </div>
                 
@@ -402,7 +460,7 @@
 
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.4.0</span></p>
+        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.5.0</span></p>
         <p class="mt-1">Need help? Chat with us on WhatsApp:
             <a href="https://wa.me/2347053331253" target="_blank" rel="noopener" class="inline-flex items-center font-semibold text-indigo-500 hover:text-indigo-600 transition-colors duration-300" aria-label="Chat with us on WhatsApp">
                 <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -474,11 +532,53 @@
         </div>
     </div>
 
+    <!-- DAY ACTION MODAL -->
+    <div id="day-action-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-label="Day actions">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="day-action-backdrop"></div>
+        <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl z-10 overflow-hidden">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 px-6 py-4 text-white">
+                <h2 class="text-lg font-bold tracking-tight" id="day-action-title">Voucher Period</h2>
+                <p class="text-xs text-indigo-100 mt-0.5" id="day-action-date">Select a day to continue</p>
+            </div>
+            <div class="px-6 py-5 text-sm text-gray-700">
+                <label class="block text-xs font-bold uppercase tracking-wide text-gray-500 mb-2" for="day-action-select">Choose an action for this day</label>
+                <select id="day-action-select" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"></select>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <button id="day-action-cancel" class="text-sm font-semibold text-gray-500 px-5 py-2 rounded-full hover:bg-gray-100 transition" aria-label="Cancel">Cancel</button>
+                <button id="day-action-continue" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-2.5 rounded-full transition shadow-md" aria-label="Apply action">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAID AMOUNT MODAL -->
+    <div id="paid-amount-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-label="Enter payment amount">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="paid-amount-backdrop"></div>
+        <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl z-10 overflow-hidden">
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-4 text-white">
+                <h2 class="text-lg font-bold tracking-tight">Enter Payment Amount</h2>
+                <p class="text-xs text-emerald-100 mt-0.5" id="paid-amount-date">For the current voucher period</p>
+            </div>
+            <div class="px-6 py-5 text-sm text-gray-700">
+                <label class="block text-xs font-bold uppercase tracking-wide text-gray-500 mb-2" for="paid-amount-input">Amount paid</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₦</span>
+                    <input type="number" id="paid-amount-input" min="0" step="0.01" placeholder="82,850.43" inputmode="decimal" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-400" aria-label="Amount paid in naira">
+                </div>
+                <p class="text-xs text-gray-400 mt-2">Counting stops for this voucher period and the day is marked <strong>PAID</strong>.</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <button id="paid-amount-cancel" class="text-sm font-semibold text-gray-500 px-5 py-2 rounded-full hover:bg-gray-100 transition" aria-label="Cancel">Cancel</button>
+                <button id="paid-amount-submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-2.5 rounded-full transition shadow-md" aria-label="Mark paid">Mark Paid</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ── APP VERSION ──
         // Bump this on every push. Follow semver: major.minor.patch
         // major = breaking change, minor = new feature, patch = bug fix / small tweak
-        const APP_VERSION = '1.4.0';
+        const APP_VERSION = '1.5.0';
 
         // ── SHIFT PATTERN CONSTANTS ──
         const SHIFT_COLORS = {
@@ -516,6 +616,36 @@
         let missedDays = JSON.parse(localStorage.getItem('missedDays')) || [];
         let isSettingCycle = false;
         let periodOffset = 0;
+
+        // Paid days: [{ date: 'YYYY-MM-DD', amount: number }] — one per voucher period stops counting for that period.
+        let paidDays = JSON.parse(localStorage.getItem('paidDays') || '[]');
+        // State used by the day-action dialog flow.
+        let actionDay = null;   // 'YYYY-MM-DD' of the day being acted on
+        let actionBtn = null;   // reference to the clicked day button (for popup positioning)
+        let actionPeriod = null; // { start:Date, end:Date } of the currently-viewed voucher period
+
+        // Date utility: Date → 'YYYY-MM-DD'
+        function keyOf(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${dd}`;
+        }
+        function getPaidForPeriod(startDate, endDate) {
+            if (!paidDays.length) return null;
+            const sk = keyOf(startDate), ek = keyOf(endDate);
+            return paidDays.find(p => p.date >= sk && p.date <= ek) || null;
+        }
+        function savePaidDays() {
+            localStorage.setItem('paidDays', JSON.stringify(paidDays));
+        }
+        function rangeLabel(startDate, endDate) {
+            const o = { month: 'short', day: 'numeric' };
+            return `${startDate.toLocaleDateString('en-US', o)} \u2013 ${endDate.toLocaleDateString('en-US', o)}`;
+        }
+        function formatNaira(amount) {
+            return '\u20A6' + amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
 
         // Shift segments: [{ startDate: 'YYYY-MM-DD', pattern: [...] }]
         // Migration: no segments saved → single 2-2-2 segment starting at the anchor.
@@ -668,6 +798,11 @@
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             updateDashboardHeader(startDate, endDate);
 
+            // If this voucher period is already paid, stop counting from the paid day onward.
+            const paidForPeriod = getPaidForPeriod(startDate, endDate);
+            const countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(endDate);
+            const isPaidDay = (key) => paidForPeriod && paidForPeriod.date === key;
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -751,17 +886,21 @@
                     }
                 } else {
                     const isMissed = missedDays.includes(fullDateString);
+                    const shouldCount = fullDateString <= countEndKey;
 
-                    if (!shiftInfo.work) {
-                        offCount++;
+                    if (isPaidDay(fullDateString)) {
+                        classes += ' bg-gradient-to-br from-emerald-400 to-green-600 text-white border-emerald-500 shadow-md ring-2 ring-emerald-200';
+                        inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">PAID</span>`;
+                    } else if (!shiftInfo.work) {
+                        if (shouldCount) offCount++;
                         classes += ` ${shiftInfo.color}`;
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">${shiftInfo.label}</span>`;
                     } else if (isMissed) {
-                        missedCount++;
+                        if (shouldCount) missedCount++;
                         classes += ' bg-red-500 text-white border-red-600 shadow-md ring-2 ring-red-300';
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.4rem] sm:text-[0.55rem] lg:text-[0.6rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">MISSED</span>`;
                     } else {
-                        presentCount++;
+                        if (shouldCount) presentCount++;
                         classes += ` ${shiftInfo.color} hover:shadow-lg hover:-translate-y-0.5`;
                         inner = `<span>${dayOfMonth}</span><span class="text-[0.45rem] sm:text-[0.6rem] lg:text-[0.65rem] font-bold uppercase tracking-widest mt-0.5 sm:mt-1">${shiftInfo.label}</span>`;
                     }
@@ -791,6 +930,8 @@
                 document.getElementById('streak-display').textContent = '';
             }
 
+            updatePaidSummary(startDate, endDate, paidForPeriod);
+
         }
 
         // ── POPUP ANIMATIONS ──
@@ -810,6 +951,15 @@
         function showMissedPopup(btn) { showPopup(btn, 'MISSED', 'missed-popup'); }
         function showAnchorPopup(btn) { showPopup(btn, 'ANCHOR ✓', 'anchor-popup'); }
         function showUnmissedPopup(btn) { showPopup(btn, 'UNMISSED ✓', 'unmissed-popup'); }
+        function showPaidPopup(btn) { showPopup(btn, 'PAID ✓', 'paid-popup'); }
+        function showCopyToast(date) {
+            navigator.clipboard.writeText(date).catch(() => {});
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-xs z-50 shadow-lg';
+            toast.textContent = `Copied ${date}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
 
         // ── EVENT DELEGATION ──
         document.getElementById('calendar-grid').onclick = function (e) {
@@ -833,38 +983,132 @@
                 renderCalendar();
                 showAnchorPopup(btn);
             } else {
-                const shift = getShiftInfo(dt);
-                if (!shift || !shift.work) return;
-
-                if (missedDays.includes(date)) {
-                    missedDays = missedDays.filter(d => d !== date);
-                    showUnmissedPopup(btn);
-                } else {
-                    missedDays.push(date);
-                    showMissedPopup(btn);
-                }
-                localStorage.setItem('missedDays', JSON.stringify(missedDays));
-                renderCalendar();
+                openDayDialog(btn, dt, date);
             }
         };
 
-        // ── COPY DATE (double-tap / hold) ──
-        let lastTapTime = 0;
-        document.getElementById('calendar-grid').addEventListener('click', function (e) {
-            const btn = e.target.closest('button[data-date]');
-            if (!btn) return;
-            const now = Date.now();
-            if (now - lastTapTime < 400) {
-                const date = btn.dataset.date;
-                navigator.clipboard.writeText(date).catch(() => {});
-                const toast = document.createElement('div');
-                toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-xs z-50 shadow-lg';
-                toast.textContent = `Copied ${date}`;
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 1500);
+        // ── DAY ACTION DIALOG ──
+        function openDayDialog(btn, dt, date) {
+            actionDay = date;
+            actionBtn = btn;
+            const { startDate, endDate } = getVoucherPeriod(periodOffset);
+            actionPeriod = { start: startDate, end: endDate };
+
+            document.getElementById('day-action-date').textContent =
+                `${dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`;
+            document.getElementById('day-action-title').textContent = `${rangeLabel(startDate, endDate)} Voucher`;
+
+            const select = document.getElementById('day-action-select');
+            select.innerHTML = '';
+            const opt = (value, label, disabled) => {
+                const o = document.createElement('option');
+                o.value = value; o.textContent = label;
+                if (disabled) o.disabled = true;
+                return o;
+            };
+
+            if (paidDays.some(p => p.date === date)) {
+                const paid = paidDays.find(p => p.date === date);
+                select.appendChild(opt('', `Already paid \u00B7 ${formatNaira(paid.amount)}`, true));
+            } else {
+                const shift = getShiftInfo(dt);
+                if (missedDays.includes(date)) {
+                    select.appendChild(opt('unmiss', 'Unmiss'));
+                } else if (shift && shift.work) {
+                    select.appendChild(opt('miss', 'Missed'));
+                }
+                select.appendChild(opt('paid', 'Paid'));
+                select.appendChild(opt('copy', 'Copy Date'));
             }
-            lastTapTime = now;
-        });
+            select.selectedIndex = 0;
+
+            document.getElementById('day-action-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDayDialog() {
+            document.getElementById('day-action-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function applyDayAction() {
+            if (!actionDay) return;
+            const val = document.getElementById('day-action-select').value;
+            const btn = actionBtn;
+            if (val === 'miss') {
+                missedDays.push(actionDay);
+                localStorage.setItem('missedDays', JSON.stringify(missedDays));
+                closeDayDialog();
+                showMissedPopup(btn);
+                renderCalendar();
+            } else if (val === 'unmiss') {
+                missedDays = missedDays.filter(d => d !== actionDay);
+                localStorage.setItem('missedDays', JSON.stringify(missedDays));
+                closeDayDialog();
+                showUnmissedPopup(btn);
+                renderCalendar();
+            } else if (val === 'copy') {
+                closeDayDialog();
+                showCopyToast(actionDay);
+            } else if (val === 'paid') {
+                closeDayDialog();
+                openPaidAmountDialog();
+            }
+        }
+
+        // ── PAID AMOUNT DIALOG ──
+        function openPaidAmountDialog() {
+            if (!actionPeriod) return;
+            document.getElementById('paid-amount-date').textContent =
+                `${rangeLabel(actionPeriod.start, actionPeriod.end)} Voucher`;
+            document.getElementById('paid-amount-input').value = '';
+            document.getElementById('paid-amount-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => document.getElementById('paid-amount-input').focus(), 50);
+        }
+
+        function closePaidAmountModal() {
+            document.getElementById('paid-amount-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function submitPaidAmount() {
+            const input = document.getElementById('paid-amount-input');
+            const amt = parseFloat(input.value);
+            if (isNaN(amt) || amt < 0) { input.focus(); return; }
+            if (!actionDay) return;
+            paidDays = paidDays.filter(p => p.date !== actionDay).concat({ date: actionDay, amount: Math.round(amt * 100) / 100 });
+            savePaidDays();
+            const btn = actionBtn;
+            closePaidAmountModal();
+            showPaidPopup(btn);
+            renderCalendar();
+        }
+
+        // ── PAID DAY SUMMARY ──
+        function updatePaidSummary(startDate, endDate, paidForPeriod) {
+            const el = document.getElementById('paid-summary');
+            if (!paidForPeriod) {
+                el.classList.add('hidden');
+                return;
+            }
+            document.getElementById('paid-summary-amount').textContent = formatNaira(paidForPeriod.amount);
+            document.getElementById('paid-summary-period').textContent = `Voucher: ${rangeLabel(startDate, endDate)}`;
+            const pd = new Date(paidForPeriod.date + 'T00:00:00');
+            const start = new Date(startDate); start.setHours(0, 0, 0, 0);
+            const days = Math.round((pd - start) / 86400000);
+            document.getElementById('paid-summary-days').textContent = days;
+            el.classList.remove('hidden');
+        }
+
+        document.getElementById('day-action-cancel').onclick = closeDayDialog;
+        document.getElementById('day-action-backdrop').onclick = closeDayDialog;
+        document.getElementById('day-action-continue').onclick = applyDayAction;
+        document.getElementById('paid-amount-cancel').onclick = closePaidAmountModal;
+        document.getElementById('paid-amount-backdrop').onclick = closePaidAmountModal;
+        document.getElementById('paid-amount-submit').onclick = submitPaidAmount;
+
+        // ── COPY DATE (moved into the day-action dialog) ──
 
         // ── EXPORT ──
         function exportData() {
@@ -872,6 +1116,7 @@
                 anchorDate: savedAnchorDate || '',
                 missedDays: missedDays,
                 shiftSegments: shiftSegments,
+                paidDays: paidDays,
                 theme: isDarkMode() ? 'dark' : 'light',
                 exportedAt: new Date().toISOString()
             };
@@ -932,6 +1177,11 @@
                     localStorage.setItem('anchorDate', savedAnchorDate || '');
                     localStorage.setItem('missedDays', JSON.stringify(missedDays));
                     localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments));
+                    paidDays = Array.isArray(data.paidDays)
+                        ? data.paidDays.filter(p => p && p.date && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && !isNaN(parseFloat(p.amount)))
+                            .map(p => ({ date: p.date, amount: Math.round(parseFloat(p.amount) * 100) / 100 }))
+                        : [];
+                    localStorage.setItem('paidDays', JSON.stringify(paidDays));
                     if (data.theme) {
                         localStorage.setItem('theme', data.theme);
                         applyTheme(data.theme === 'dark');
@@ -988,9 +1238,11 @@
                 localStorage.removeItem('anchorDate');
                 localStorage.removeItem('missedDays');
                 localStorage.removeItem('shiftSegments');
+                localStorage.removeItem('paidDays');
                 savedAnchorDate = null;
                 missedDays = [];
                 shiftSegments = [];
+                paidDays = [];
                 periodOffset = 0;
                 isSettingCycle = false;
                 const btn = document.getElementById('set-cycle-btn');
@@ -1041,15 +1293,15 @@
             if (!savedAnchorDate) return;
             const { startDate, endDate } = getVoucherPeriod(periodOffset);
             const today = new Date(); today.setHours(0, 0, 0, 0);
+            const paidForPeriod = getPaidForPeriod(startDate, endDate);
+            const countEndKey = paidForPeriod ? paidForPeriod.date : keyOf(today);
             const labelCounts = {};
             let miss = 0, pres = 0;
             let d = new Date(startDate);
             while (d <= endDate) {
                 if (d > today) { d.setDate(d.getDate() + 1); continue; }
-                const y = d.getFullYear();
-                const mo = String(d.getMonth() + 1).padStart(2, '0');
-                const dd = String(d.getDate()).padStart(2, '0');
-                const ds = `${y}-${mo}-${dd}`;
+                const ds = keyOf(d);
+                if (ds > countEndKey) { d.setDate(d.getDate() + 1); continue; }
                 const shift = getShiftInfo(d);
                 if (shift) {
                     labelCounts[shift.label] = (labelCounts[shift.label] || 0) + 1;

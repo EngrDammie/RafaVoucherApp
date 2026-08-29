@@ -1,6 +1,6 @@
 # 📅 RafaVoucherApp
 
-A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage any shift schedule (2-2-2 by default, but fully customizable), mark missed days, track streaks, view attendance percentages, and export data — all offline, in your browser, with no backend or sign-up.
+A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. Manage any shift schedule (2-2-2 by default, but fully customizable), mark missed days, track streaks, view attendance percentages, record your payment per voucher period, and export data — all offline, in your browser, with no backend or sign-up.
 
 > **Live demo:** open `index.html` in any modern browser. No install, no build step.
 
@@ -13,14 +13,15 @@ A full-featured **Voucher Attendance Tracker** built as a single-file HTML app. 
 - **Mid-Period Pattern Switching** — Change your pattern from any chosen date; days before it keep their old pattern, so history is never rewritten.
 - **Live Pattern Preview** — See the first 14 days of a new pattern before you save it.
 - **Configurable Anchor Date** — Tap any day as your cycle start; the entire calendar recomputes instantly.
-- **One-Tap Missed-Day Toggle** — Tap any M/N day to mark it missed (red). Tap again to unmark (green confirmation popup).
+- **Day Action Dialog** — Tap any day to open an action dialog (titled with the current voucher period) with a drop-down: **Missed**, **Unmiss** (if already missed), **Paid**, or **Copy Date**.
+- **Record Payment (PAID)** — Choose **Paid** and enter the amount (e.g. ₦82,850.43). The day turns green **PAID**, counting stops for that voucher period, and a summary card shows the amount, the voucher period, and how many days passed from period start to payment.
 - **Attendance Percentage** — See your present vs. total-working-day percentage below the main counter.
 - **Present Streak Counter** — Consecutive present-day streak (backward from today) shown with a fire icon.
 - **Period Navigation** — Use arrow buttons or **swipe left/right** on the calendar grid.
-- **Period Summary Tooltip** — Tap the period label to see M/N/OFF/Present/Missed counts.
+- **Period Summary Tooltip** — Tap the period label to see M/N/OFF/Present/Missed counts (capped at the paid day if the period is paid).
 - **Anchor Confirmation Popup** — Green "ANCHOR ✓" animation when setting a new start date.
-- **Missed / Un-missed Popups** — Animated MISSED (red) and UNMISSED ✓ (green) feedback on tap.
-- **Copy Date** — Double-tap any day button to copy its YYYY-MM-DD date to your clipboard.
+- **Missed / Un-missed / PAID Popups** — Animated MISSED (red), UNMISSED ✓ (green) and PAID ✓ (green) feedback on actions.
+- **Copy Date** — Via the day action dialog, copy any day's YYYY-MM-DD date to your clipboard.
 - **Export / Import / Reset** — Export as JSON or CSV, import JSON backups, or reset all data.
 - **Help Attention** — On first visit, the help button pulses with a hint bubble until the guide is opened once.
 - **WhatsApp Contact** — One-tap WhatsApp link in the footer for support.
@@ -55,7 +56,7 @@ python3 -m http.server 8000
 2. Tap **Set Cycle Start** above the calendar.
 3. The message disappears and day buttons appear. Tap any past day to set it as your **anchor date**.
 4. The calendar instantly fills with color-coded M (Morning), N (Night), and OFF labels.
-5. Tap any working day (M or N) to mark it **MISSED** (red). Tap again to unmark.
+5. Tap any day to open the **action dialog** and choose **Missed** to mark a working day **MISSED** (red). Choose **Paid** to record your payment for the period.
 6. Watch your stats, percentage, and streak update in real time.
 
 ---
@@ -93,6 +94,7 @@ All state is saved in your browser's `localStorage`:
 | `anchorDate`  | `string` (`YYYY-MM-DD`)     | The cycle-start day that drives shift labels. |
 | `missedDays`  | `JSON` array of date strings| Days the user marked as missed.               |
 | `shiftSegments`| `JSON` array of segments   | `[{startDate, pattern:[{label, work, night, color}]}]` — every pattern switch adds a dated segment. |
+| `paidDays`    | `JSON` array of payments  | `[{date:'YYYY-MM-DD', amount:number}]` — the day the user was paid for a voucher period. Stops counting for that period. |
 | `theme`       | `"light"` or `"dark"`       | User's theme preference.                      |
 | `helpIntroSeen`| `"1"` (set once)           | Marks that the help guide has been opened once.|
 
@@ -115,10 +117,10 @@ Tap **Shift Pattern** to open the editor: choose a preset or build a custom patt
 Walks backward from the period end date (or today, whichever is earlier), skipping OFF days and stopping at the first missed day, counting consecutive present days.
 
 ### Rendering (`renderCalendar`)
-Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. The friendly banner is shown only when no anchor is set and the user is not in cycle-setting mode.
+Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. When a voucher period is paid, counting stops at the paid day (days after it still render but aren't counted), and a green **PAID** summary card shows the amount, the voucher period, and days-to-payment. The friendly banner is shown only when no anchor is set and the user is not in cycle-setting mode.
 
-### Event Delegation
-A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle all day clicks, whether toggling missed status or setting the anchor date. A separate `click` listener handles double-tap date copying.
+### Day Action Dialog
+A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle day clicks. Outside cycle-setting mode, tapping any past day opens the **Day Action** dialog titled with the current voucher period. Its drop-down offers **Missed** / **Unmiss** (if already missed) / **Paid** / **Copy Date**. Choosing **Paid** opens a second dialog to enter the amount; on submit the day is stored in `paidDays`, marked green **PAID**, and a `PAID ✓` popup fires. Copy date is handled inside this dialog (it replaced the old double-tap shortcut).
 
 ---
 
@@ -128,11 +130,12 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 |-------------------------------|--------------------------------------------------|
 | Set / change cycle start      | Tap **Set Cycle Start**, then tap a day.         |
 | Change your shift pattern     | Tap **Shift Pattern**, build/select a pattern, pick a start date, Save. |
-| Mark a day missed             | Tap any M or N day. Red MISSED popup appears.    |
-| Unmark a missed day           | Tap the red day again. Green UNMISSED ✓ popup.   |
+| Mark a day missed             | Tap a day → dialog → **Missed**. Red MISSED popup. |
+| Unmark a missed day           | Tap the day → dialog → **Unmiss**. Green UNMISSED ✓ popup. |
+| Record payment                | Tap a day → dialog → **Paid** → enter amount → **Mark Paid**. Green PAID ✓ popup + summary card. |
 | Navigate periods              | Arrow buttons or swipe left/right on the grid.   |
 | View period summary           | Tap the period label below the date range.       |
-| Copy a date                   | Double-tap any day button.                       |
+| Copy a date                   | Tap a day → dialog → **Copy Date**.              |
 | Open the help guide           | Tap the `?` button (pulses on first visit).      |
 | Contact support               | Tap the WhatsApp number in the footer.           |
 | Toggle dark mode              | Sun/moon toggle at top-left corner.              |
@@ -148,7 +151,8 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 - ✅ 2-2-2 shift engine with configurable anchor
 - ✅ Customizable shift patterns (presets + chip builder + live preview)
 - ✅ Mid-period pattern switching via dated segments
-- ✅ Missed-day toggling with red highlighting
+- ✅ Missed-day toggling with red highlighting (via day action dialog)
+- ✅ Paid-day tracking — record amount, mark PAID, stop counting, show days-to-payment summary
 - ✅ Dashboard counters (present, missed, off)
 - ✅ Attendance percentage and streak counter
 - ✅ Period navigation (previous / next)
@@ -158,8 +162,8 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 - ✅ Data import with validation
 - ✅ Data reset
 - ✅ Dark mode toggle
-- ✅ Animated popups (MISSED, UNMISSED, anchor)
-- ✅ Copy date on double-tap
+- ✅ Animated popups (MISSED, UNMISSED, anchor, PAID)
+- ✅ Copy date (via the day action dialog)
 - ✅ Accessibility (ARIA labels, roles, semantic HTML)
 - ✅ Responsive design (mobile / tablet / desktop)
 - ✅ Help guide modal
@@ -169,6 +173,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 ### Known Limitations
 
 - Shift labels are currently M / N / OFF only — custom labels and night-shift pay multipliers are planned.
+- One paid record is kept per voucher period; re-recording payment on the same day updates the amount, but there is no explicit "unmark paid" action.
 - `missedDays` entries persist across periods — they are not automatically cleaned up (but unused entries have no visible effect in periods where they don't fall within the date range).
 - Future days are rendered but not clickable.
 - CSV export only covers the currently viewed period.
