@@ -54,8 +54,8 @@ python3 -m http.server 8000
 
 1. On first open, you'll see a friendly welcome message and `--` for all counters.
 2. Tap **Set Cycle Start** above the calendar.
-3. The message disappears and day buttons appear. Tap any past day to set it as your **anchor date**.
-4. The calendar instantly fills with color-coded M (Morning), N (Night), and OFF labels.
+3. A dialog opens &mdash; pick your **start date** (your **anchor date**) and choose a **shift pattern** (preset like 2-2-2 or any custom M / N / OFF pattern), then tap **Save Pattern**.
+4. The calendar instantly fills with color-coded M (Morning), N (Night), and OFF labels from that anchor on.
 5. Tap any day to open the **action dialog** and choose **Missed** to mark a working day **MISSED** (red). Choose **Paid** to record your payment for the period.
 6. Watch your stats, percentage, and streak update in real time.
 
@@ -111,16 +111,16 @@ Computes a start date (20th of the current or previous month) and end date (19th
 Patterns are stored as data — each entry has a label plus `work` / `night` / `color` flags, so any repeating schedule works. Segments are `{startDate, pattern}` pairs (the first segment's start is the anchor date). For any target date, the engine picks the most recent segment whose start date is on or before it, then walks the pattern via modulo indexing: `((diffDays % len) + len) % len`. Dates before the first segment wrap backward around the first pattern. Changing your pattern simply appends a new dated segment — history is never rewritten.
 
 ### Pattern Editor
-Tap **Shift Pattern** to open the editor: choose a preset or build a custom pattern with `+ M` / `+ N` / `+ OFF` chips (tap a chip to remove it), pick the start date, check the live 14-day preview, then save. A saved switch applies from the chosen date onward (future dates allowed).
+Tap **Shift Pattern** to open the editor: choose a preset or build a custom pattern with `+ M` / `+ N` / `+ OFF` chips (tap a chip to remove it), pick the start date, check the live 14-day preview, then save. A saved switch applies from the chosen date onward (future dates allowed) and never rewrites history. **Set / Change Cycle Start** opens the same editor in *new-cycle* mode — the start date becomes your anchor and the picked pattern is applied from there (rebuilding the schedule).
 
 ### Streak Calculation (`calcStreak`)
 Walks backward from the period end date (or today, whichever is earlier), skipping OFF days and stopping at the first missed day, counting consecutive present days.
 
 ### Rendering (`renderCalendar`)
-Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. When a voucher period is paid, a green **PAID** summary card shows the amount, the **previous voucher period** it pays for, and days-to-payment (measured from the previous period's start to the pay day). The friendly banner is shown only when no anchor is set and the user is not in cycle-setting mode.
+Clears and rebuilds the calendar grid. Every day is a `<button>` with `data-date`. Future days are muted and not clickable. Past days get shift-based colors. When a voucher period is paid, a green **PAID** summary card shows the amount, the **previous voucher period** it pays for, and days-to-payment (measured from the previous period's start to the pay day). The friendly banner is shown only when no anchor is set.
 
 ### Day Action Dialog
-A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle day clicks. Outside cycle-setting mode, tapping any past day opens the **Day Action** dialog titled with the current voucher period. Its drop-down offers **Missed** / **Unmiss** (if already missed) / **Paid** / **Copy Date**. Choosing **Paid** opens a second dialog to enter the amount (labelled as paying the **previous voucher period**); on submit the day is stored in `paidDays`, marked green **PAID**, and a `PAID ✓` popup fires. Copy date is handled inside this dialog (it replaced the old double-tap shortcut).
+A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[data-date]')` to handle day clicks: tapping any past day opens the **Day Action** dialog titled with the current voucher period. Its drop-down offers **Missed** / **Unmiss** (if already missed) / **Paid** / **Copy Date**. Choosing **Paid** opens a second dialog to enter the amount (labelled as paying the **previous voucher period**); on submit the day is stored in `paidDays`, marked green **PAID**, and a `PAID ✓` popup fires. Copy date is handled inside this dialog (it replaced the old double-tap shortcut).
 
 ---
 
@@ -128,7 +128,7 @@ A single `onclick` handler on `#calendar-grid` uses `e.target.closest('button[da
 
 | Action                        | How                                             |
 |-------------------------------|--------------------------------------------------|
-| Set / change cycle start      | Tap **Set Cycle Start**, then tap a day.         |
+| Set / change cycle start      | Tap **Set Cycle Start**, pick start date + pattern, Save. |
 | Change your shift pattern     | Tap **Shift Pattern**, build/select a pattern, pick a start date, Save. |
 | Mark a day missed             | Tap a day → dialog → **Missed**. Red MISSED popup. |
 | Unmark a missed day           | Tap the day → dialog → **Unmiss**. Green UNMISSED ✓ popup. |

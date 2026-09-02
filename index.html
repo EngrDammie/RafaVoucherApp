@@ -237,9 +237,9 @@
 
         <!-- CALENDAR SECTION -->
         <div class="p-3 sm:p-6">
-            <div class="flex justify-between items-center mb-3 gap-2">
-                <h3 class="text-lg font-bold text-gray-800" id="calendar-heading">Attendance Grid</h3>
-                <div class="flex gap-2 shrink-0">
+            <div class="flex flex-wrap justify-between items-center mb-3 gap-x-2 gap-y-2">
+                <h3 class="text-lg font-bold text-gray-800 min-w-0" id="calendar-heading">Attendance Grid</h3>
+                <div class="flex flex-wrap gap-2">
                     <button id="pattern-btn" class="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-2 rounded-full hover:bg-purple-100 transition shadow-sm border border-purple-100" aria-label="Change shift pattern" title="Change shift pattern">
                         Shift Pattern
                     </button>
@@ -300,15 +300,14 @@
                 <hr class="border-gray-100">
                 
                 <div>
-                    <h3 class="font-bold text-indigo-600 text-base mb-1">1. Set Your Start Date</h3>
-                    <p class="mb-2">Before anything else, you need to tell the app <strong>when your cycle begins</strong>.</p>
+                    <h3 class="font-bold text-indigo-600 text-base mb-1">1. Set Your Start Date &amp; Pattern</h3>
+                    <p class="mb-2">Before anything else, you need to tell the app <strong>when your cycle begins</strong> and <strong>which pattern</strong> you work.</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
                         <li>Tap the <strong>&quot;Set Cycle Start&quot;</strong> button above the calendar.</li>
-                        <li>The button will change to <strong>&quot;Select Day Below...&quot;</strong>.</li>
-                        <li>Now tap any day on the calendar &mdash; that day becomes your <strong>anchor date</strong>.</li>
-                        <li>The calendar will instantly color-code every day based on your shift pattern.</li>
+                        <li>A dialog opens &mdash; pick your <strong>start date</strong> (this becomes your <strong>anchor date</strong>) and choose your <strong>shift pattern</strong> (preset or your own).</li>
+                        <li>Tap <strong>Save Pattern</strong> &mdash; the calendar will instantly color-code every day from that anchor on.</li>
                     </ul>
-                    <p class="mt-2 text-gray-500 italic">You can change your start date anytime by tapping &quot;Change Cycle Start.&quot; You can also switch to a different shift pattern anytime &mdash; see section 9.</p>
+                    <p class="mt-2 text-gray-500 italic">You can change your start date and pattern together anytime by tapping &quot;Change Cycle Start.&quot; You can also add a different pattern later without touching your history &mdash; see section 9.</p>
                 </div>
 
                 <hr class="border-gray-100">
@@ -426,6 +425,7 @@
                     <h3 class="font-bold text-indigo-600 text-base mb-1">9. Use Your Own Shift Pattern</h3>
                     <p class="mb-2">Don&rsquo;t work a 2-2-2? No problem &mdash; the app works with <strong>any</strong> repeating pattern. Tap <strong>&quot;Shift Pattern&quot;</strong> above the calendar to open the pattern editor.</p>
                     <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li>The <strong>first time</strong>, just use <strong>&quot;Set Cycle Start&quot;</strong> instead &mdash; it opens the same dialog so you can pick your start date (anchor) and pattern together in one step.</li>
                         <li><strong>Pick a preset</strong> &mdash; e.g. 3M / 4OFF, 5M / 2OFF, 1-1-1, or 4M / 2OFF.</li>
                         <li>Or <strong>build your own</strong> pattern chip by chip using the + M, + N and + OFF buttons. Tap a chip to remove it.</li>
                         <li>Choose <strong>when the pattern starts</strong> &mdash; today, or any future date (e.g. your next roster change).</li>
@@ -460,7 +460,7 @@
 
     <!-- FOOTER -->
     <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.6.0</span></p>
+        <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.7.0</span></p>
         <p class="mt-1">Need help? Chat with us on WhatsApp:
             <a href="https://wa.me/2347053331253" target="_blank" rel="noopener" class="inline-flex items-center font-semibold text-indigo-500 hover:text-indigo-600 transition-colors duration-300" aria-label="Chat with us on WhatsApp">
                 <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -490,7 +490,7 @@
 
                 <div>
                     <h3 class="font-bold text-indigo-600 text-base mb-1">Start Date</h3>
-                    <p class="text-gray-600 mb-2">The new pattern applies <strong>from this date onward</strong>. Days before keep their old pattern &mdash; your history is never rewritten.</p>
+                    <p id="pattern-start-help" class="text-gray-600 mb-2">The new pattern applies <strong>from this date onward</strong>. Days before keep their old pattern &mdash; your history is never rewritten.</p>
                     <input type="date" id="pattern-start-date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="Pattern start date">
                 </div>
 
@@ -578,7 +578,7 @@
         // ── APP VERSION ──
         // Bump this on every push. Follow semver: major.minor.patch
         // major = breaking change, minor = new feature, patch = bug fix / small tweak
-        const APP_VERSION = '1.6.0';
+        const APP_VERSION = '1.7.0';
 
         // ── SHIFT PATTERN CONSTANTS ──
         const SHIFT_COLORS = {
@@ -614,7 +614,6 @@
         // ── STATE ──
         let savedAnchorDate = localStorage.getItem('anchorDate') || null;
         let missedDays = JSON.parse(localStorage.getItem('missedDays')) || [];
-        let isSettingCycle = false;
         let periodOffset = 0;
 
         // Paid days: [{ date: 'YYYY-MM-DD', amount: number }] — one payment per voucher
@@ -829,12 +828,12 @@
                 gridContainer.appendChild(header);
             }
 
-            // Friendly banner when no anchor and not in cycle-setting mode
-            if (!savedAnchorDate && !isSettingCycle) {
+            // Friendly banner when no anchor set yet
+            if (!savedAnchorDate) {
                 const msg = document.createElement('div');
                 msg.id = 'friendly-banner';
                 msg.className = 'col-span-7 flex flex-col items-center justify-center py-10 text-gray-400 text-sm';
-                msg.innerHTML = '<span class="text-3xl mb-2">📋</span><span>Tap <strong>"Set Cycle Start"</strong> above,<br>then tap <strong>any day</strong> to begin!</span>';
+                msg.innerHTML = '<span class="text-3xl mb-2">📋</span><span>Tap <strong>"Set Cycle Start"</strong> above,<br>then choose your <strong>start date</strong> and <strong>shift pattern</strong> to begin!</span>';
                 gridContainer.appendChild(msg);
                 document.getElementById('days-present-count').innerText = '--';
                 document.getElementById('days-missed-count').innerText = '--';
@@ -958,7 +957,6 @@
         }
 
         function showMissedPopup(btn) { showPopup(btn, 'MISSED', 'missed-popup'); }
-        function showAnchorPopup(btn) { showPopup(btn, 'ANCHOR ✓', 'anchor-popup'); }
         function showUnmissedPopup(btn) { showPopup(btn, 'UNMISSED ✓', 'unmissed-popup'); }
         function showPaidPopup(btn) { showPopup(btn, 'PAID ✓', 'paid-popup'); }
         function showCopyToast(date) {
@@ -980,20 +978,7 @@
             const today = new Date(); today.setHours(0, 0, 0, 0);
             if (dt > today) return;
 
-            if (isSettingCycle) {
-                localStorage.setItem('anchorDate', date);
-                savedAnchorDate = date;
-                const currentPattern = shiftSegments.length ? shiftSegments[shiftSegments.length - 1].pattern : pattern222();
-                shiftSegments = [{ startDate: date, pattern: currentPattern }];
-                localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments));
-                isSettingCycle = false;
-                document.getElementById('set-cycle-btn').innerText = 'Change Cycle Start';
-                document.getElementById('set-cycle-btn').classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
-                renderCalendar();
-                showAnchorPopup(btn);
-            } else {
-                openDayDialog(btn, dt, date);
-            }
+            openDayDialog(btn, dt, date);
         };
 
         // ── DAY ACTION DIALOG ──
@@ -1204,7 +1189,6 @@
                     const btn = document.getElementById('set-cycle-btn');
                     btn.innerText = savedAnchorDate ? 'Change Cycle Start' : 'Set Cycle Start';
                     btn.classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
-                    isSettingCycle = false;
                     periodOffset = 0;
                     renderCalendar();
                     alert('Data imported successfully!');
@@ -1259,7 +1243,6 @@
                 shiftSegments = [];
                 paidDays = [];
                 periodOffset = 0;
-                isSettingCycle = false;
                 const btn = document.getElementById('set-cycle-btn');
                 btn.innerText = 'Set Cycle Start';
                 btn.classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
@@ -1269,11 +1252,7 @@
 
         // ── EVENT WIRING ──
         document.getElementById('set-cycle-btn').onclick = function () {
-            isSettingCycle = true;
-            this.innerText = 'Select Day Below...';
-            this.classList.add('animate-pulse', 'bg-red-100', 'text-red-600');
-            const banner = document.getElementById('friendly-banner');
-            if (banner) banner.remove();
+            openPatternModal('newCycle');
         };
 
         document.getElementById('prev-period-btn').onclick = function () {
@@ -1337,17 +1316,26 @@
 
         // ── SHIFT PATTERN EDITOR ──
         let patternEditorPattern = [];
+        // 'newCycle' = user is (re)setting the anchor — Save replaces ALL segments with one.
+        // 'append'   = user is adding/changing a future pattern — history is never rewritten.
+        let patternEditorNewCycle = false;
 
-        function openPatternEditor() {
-            if (!shiftSegments.length) {
+        function openPatternModal(mode) {
+            patternEditorNewCycle = (mode === 'newCycle');
+            if (mode === 'append' && !shiftSegments.length) {
                 const btn = document.getElementById('pattern-btn');
                 showPopup(btn, 'SET CYCLE START FIRST', 'anchor-popup');
                 return;
             }
-            patternEditorPattern = shiftSegments[shiftSegments.length - 1].pattern.map(s => s.label);
+            patternEditorPattern = shiftSegments.length
+                ? shiftSegments[shiftSegments.length - 1].pattern.map(s => s.label)
+                : pattern222().map(s => s.label);
             const t = new Date();
             document.getElementById('pattern-start-date').value =
                 `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+            document.getElementById('pattern-start-help').innerHTML = patternEditorNewCycle
+                ? 'This date becomes your <strong>new cycle (anchor) start</strong> &mdash; your whole schedule is rebuilt from that day, using the pattern you pick below.'
+                : 'The new pattern applies <strong>from this date onward</strong>. Days before keep their old pattern &mdash; your history is never rewritten.';
             renderPatternEditor();
             document.getElementById('pattern-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -1416,7 +1404,7 @@
             }
         }
 
-        document.getElementById('pattern-btn').onclick = openPatternEditor;
+        document.getElementById('pattern-btn').onclick = function () { openPatternModal('append'); };
         document.getElementById('pattern-close').onclick = closePatternEditor;
         document.getElementById('pattern-cancel').onclick = closePatternEditor;
         document.getElementById('pattern-backdrop').onclick = closePatternEditor;
@@ -1433,6 +1421,26 @@
             const saveBtn = this;
             if (!sd) { showPopup(saveBtn, 'PICK A DATE', 'missed-popup'); return; }
             if (!patternEditorPattern.length) { showPopup(saveBtn, 'PATTERN IS EMPTY', 'missed-popup'); return; }
+
+            if (patternEditorNewCycle) {
+                // Re-anchoring: the chosen date becomes the new cycle start and the picked
+                // pattern lays out the whole schedule from there (dates before wrap backward).
+                const t = new Date();
+                const todayKey = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+                if (sd > todayKey) { showPopup(saveBtn, 'ANCHOR CANNOT BE IN THE FUTURE', 'missed-popup'); return; }
+                shiftSegments = [{ startDate: sd, pattern: patternEditorPattern.map(makeShift) }];
+                localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments));
+                savedAnchorDate = shiftSegments[0].startDate;
+                localStorage.setItem('anchorDate', savedAnchorDate);
+                patternEditorNewCycle = false;
+                closePatternEditor();
+                renderCalendar();
+                const anchorBtn = document.getElementById('set-cycle-btn');
+                anchorBtn.innerText = 'Change Cycle Start';
+                showPopup(anchorBtn, 'ANCHOR SET ✓', 'anchor-popup');
+                return;
+            }
+
             if (sd < shiftSegments[0].startDate) { showPopup(saveBtn, 'TOO EARLY', 'missed-popup'); return; }
             if (sd === shiftSegments[shiftSegments.length - 1].startDate) {
                 shiftSegments[shiftSegments.length - 1].pattern = patternEditorPattern.map(makeShift);
@@ -1443,6 +1451,7 @@
             localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments));
             savedAnchorDate = shiftSegments[0].startDate;
             localStorage.setItem('anchorDate', savedAnchorDate);
+            patternEditorNewCycle = false;
             closePatternEditor();
             renderCalendar();
             showPopup(document.getElementById('pattern-btn'), 'PATTERN SAVED ✓', 'anchor-popup');

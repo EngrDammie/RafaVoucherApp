@@ -63,7 +63,7 @@ The logo is a single-path custom brand mark. Use it exactly:
 ### 2.4 Footer (OUTSIDE and BELOW the main card)
 ```html
 <footer id="app-footer" class="w-full max-w-md mt-6 pb-8 text-center text-[0.65rem] text-gray-400 leading-relaxed">
-  <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.6.0</span></p>
+  <p>App Developed By <span class="font-semibold text-indigo-500">Dammie Optimus Solutions</span>. &copy; <span id="copyright-year"></span> All rights reserved. <span id="app-version" class="opacity-50">v1.7.0</span></p>
   <p class="mt-1">Need help? Chat with us on WhatsApp:
     <a href="https://wa.me/2347053331253" target="_blank" rel="noopener" class="inline-flex items-center font-semibold text-indigo-500 hover:text-indigo-600 transition-colors duration-300" aria-label="Chat with us on WhatsApp">
       [WhatsApp SVG icon, inline, 12x14px, `class="w-3.5 h-3.5 mr-1"`, standard WhatsApp chat-bubble path] 0705 333 1253
@@ -71,7 +71,7 @@ The logo is a single-path custom brand mark. Use it exactly:
   </p>
 </footer>
 ```
-JavaScript sets `#copyright-year` to the current year and `#app-version` to `'v' + APP_VERSION` on load (overwriting the static `v1.6.0`).
+JavaScript sets `#copyright-year` to the current year and `#app-version` to `'v' + APP_VERSION` on load (overwriting the static `v1.7.0`).
 
 ---
 
@@ -143,9 +143,9 @@ Hidden by default (`hidden` class). Shown by `updatePaidSummary` when the viewed
 ### 3.4 Calendar section
 ```html
 <div class="p-3 sm:p-6">
-  <div class="flex justify-between items-center mb-3 gap-2">
-    <h3 class="text-lg font-bold text-gray-800" id="calendar-heading">Attendance Grid</h3>
-    <div class="flex gap-2 shrink-0">
+  <div class="flex flex-wrap justify-between items-center mb-3 gap-x-2 gap-y-2">
+    <h3 class="text-lg font-bold text-gray-800 min-w-0" id="calendar-heading">Attendance Grid</h3>
+    <div class="flex flex-wrap gap-2">
       <button id="pattern-btn" class="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-2 rounded-full hover:bg-purple-100 transition shadow-sm border border-purple-100" aria-label="Change shift pattern" title="Change shift pattern">Shift Pattern</button>
       <button id="set-cycle-btn" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-full hover:bg-indigo-100 transition shadow-sm border border-indigo-100" aria-label="Set cycle start date">Set Cycle Start</button>
     </div>
@@ -374,7 +374,6 @@ Same overlay shell as §5.3.
 ```js
 let savedAnchorDate = localStorage.getItem('anchorDate') || null;      // 'YYYY-MM-DD' or null
 let missedDays = JSON.parse(localStorage.getItem('missedDays')) || []; // array of 'YYYY-MM-DD' strings
-let isSettingCycle = false;                                            // true while waiting for the user to pick an anchor day
 let periodOffset = 0;                                                  // 0 = current period, -1 = previous, 1 = next
 let shiftSegments = JSON.parse(localStorage.getItem('shiftSegments') || 'null'); // see 6.2
 let patternEditorPattern = [];                                         // working copy of labels in the editor, e.g. ['M','M','N','N','OFF','OFF']
@@ -429,7 +428,7 @@ savedAnchorDate = shiftSegments.length ? shiftSegments[0].startDate : savedAncho
 ## 7. CONSTANTS (verbatim)
 
 ```js
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 
 const SHIFT_COLORS = {
     amber:  { light: 'bg-amber-200 text-amber-800 border-amber-400 shadow-sm',      dark: 'bg-amber-900/60 text-amber-300 border-amber-600 shadow-sm' },
@@ -591,7 +590,7 @@ Clears `#calendar-grid` (`innerHTML = ''`), then:
 1. `updateDashboardHeader(startDate, endDate)`.
 2. Set `#calendar-heading`: if an anchor exists → `` `${startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · Attendance` `` else `'Attendance Grid'`.
 3. Weekday header row: 7 `<div>`s with `WEEKDAY_LABELS[i]`, classes `text-center text-[0.5rem] sm:text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider pb-1` (light) / `...text-gray-500...` (dark) via `cl()`.
-4. **Friendly banner** — only when `!savedAnchorDate && !isSettingCycle`: append a `<div id="friendly-banner">` with `col-span-7 flex flex-col items-center justify-center py-10 text-gray-400 text-sm`, `innerHTML = '<span class="text-3xl mb-2">📋</span><span>Tap <strong>"Set Cycle Start"</strong> above,<br>then tap <strong>any day</strong> to begin!</span>'`. Also set all four stat displays to `--`/empty. **Important: still fall through and render the day buttons below the banner.**
+4. **Friendly banner** — only when `!savedAnchorDate`: append a `<div id="friendly-banner">` with `col-span-7 flex flex-col items-center justify-center py-10 text-gray-400 text-sm`, `innerHTML = '<span class="text-3xl mb-2">📋</span><span>Tap <strong>"Set Cycle Start"</strong> above,<br>then choose your <strong>start date</strong> and <strong>shift pattern</strong> to begin!</span>'`. Also set all four stat displays to `--`/empty. **Important: still fall through and render the day buttons below the banner.**
 5. Leading empty cells: `startDow = startDate.getDay()`; append that many empty `<div>`s (no classes).
 6. Day loop from `startDate` through `endDate` (inclusive). For each day:
    - `fullDateString` = `YYYY-MM-DD`.
@@ -627,7 +626,6 @@ function showPopup(btn, text, className) {
     setTimeout(() => el.remove(), 1000);
 }
 function showMissedPopup(btn) { showPopup(btn, 'MISSED', 'missed-popup'); }
-function showAnchorPopup(btn) { showPopup(btn, 'ANCHOR ✓', 'anchor-popup'); }
 function showUnmissedPopup(btn) { showPopup(btn, 'UNMISSED ✓', 'unmissed-popup'); }
 function showPaidPopup(btn) { showPopup(btn, 'PAID ✓', 'paid-popup'); }
 function showCopyToast(date) {  // used by the day dialog "Copy Date" option
@@ -651,24 +649,10 @@ document.getElementById('calendar-grid').onclick = function (e) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     if (dt > today) return;                          // future days are not clickable
 
-    if (isSettingCycle) {
-        // Set/change the anchor: reset segments to ONE segment starting today,
-        // reusing the CURRENT (last) pattern.
-        localStorage.setItem('anchorDate', date);
-        savedAnchorDate = date;
-        const currentPattern = shiftSegments.length ? shiftSegments[shiftSegments.length - 1].pattern : pattern222();
-        shiftSegments = [{ startDate: date, pattern: currentPattern }];
-        localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments));
-        isSettingCycle = false;
-        document.getElementById('set-cycle-btn').innerText = 'Change Cycle Start';
-        document.getElementById('set-cycle-btn').classList.remove('animate-pulse', 'bg-red-100', 'text-red-600');
-        renderCalendar();
-        showAnchorPopup(btn);
-    } else {
-        // All other day clicks open the day-action dialog.
-        openDayDialog(btn, dt, date);
-    }
+    openDayDialog(btn, dt, date);
 };
+```
+The grid click handler is now a single path: all non-future day clicks open the day-action dialog. Cycle setting is handled entirely inside the pattern modal (opened by the Set Cycle Start / Change Cycle Start button).
 ```
 
 ### 8.7a Day-action dialog (replaces the old double-tap copy + inline missed toggle)
@@ -791,7 +775,7 @@ updatePaidSummary(paidPeriod.startDate, paidPeriod.endDate, paidForPeriod);
 - `paid-amount-cancel`, `paid-amount-backdrop` → `closePaidAmountModal()`
 - `paid-amount-submit` → `submitPaidAmount()`
 
-(`showPopup` / `showMissedPopup` / `showUnmissedPopup` / `showPaidPopup` / `showAnchorPopup` / `showCopyToast` are defined in §8.6; use the rect-sizing form shown there.)
+(`showPopup` / `showMissedPopup` / `showUnmissedPopup` / `showPaidPopup` / `showCopyToast` are defined in §8.6; use the rect-sizing form shown there. `ANCHOR SET ✓` after setting a new cycle is shown directly via `showPopup(setCycleBtn, 'ANCHOR SET ✓', 'anchor-popup')` inside the pattern-save handler, and `PATTERN SAVED ✓` via `showPopup(patternBtn, 'PATTERN SAVED ✓', 'anchor-popup')`.)
 
 ### 8.9 Swipe navigation (touch)
 ```js
@@ -846,11 +830,11 @@ const data = {
   - `paidDays` restored from `data.paidDays` if it is an array — keep entries where `date` matches `/^\d{4}-\d{2}-\d{2}$/` and `amount` is numeric (rounded to 2 decimals); else default `[]`.
   - Persist all keys (`anchorDate`, `missedDays`, `shiftSegments`, `paidDays`) to localStorage.
   - If `data.theme` exists: set it and `applyTheme`.
-  - Reset `#set-cycle-btn` text to `'Change Cycle Start'` if anchor else `'Set Cycle Start'`, remove pulse classes, `isSettingCycle = false`, `periodOffset = 0`, `renderCalendar()`, `alert('Data imported successfully!')`.
+  - Reset `#set-cycle-btn` text to `'Change Cycle Start'` if anchor else `'Set Cycle Start'`, remove pulse classes, `periodOffset = 0`, `renderCalendar()`, `alert('Data imported successfully!')`.
 
 ### 8.13 Reset
 - `confirm('Are you sure you want to reset ALL data? This cannot be undone.')`.
-- Remove `anchorDate`, `missedDays`, `shiftSegments`, `paidDays` from localStorage; null/empty the variables; `periodOffset = 0`; `isSettingCycle = false`; button text `'Set Cycle Start'`, pulse classes removed; `renderCalendar()`.
+- Remove `anchorDate`, `missedDays`, `shiftSegments`, `paidDays` from localStorage; null/empty the variables; `periodOffset = 0`; button text `'Set Cycle Start'`, pulse classes removed; `renderCalendar()`.
 
 ### 8.14 Period summary tooltip (`#period-label` click)
 - Guard: no anchor → return silently.
@@ -863,13 +847,22 @@ const data = {
 ## 9. SHIFT PATTERN EDITOR (full behavior)
 
 ```js
-function openPatternEditor() {
-    if (!shiftSegments.length) {
+let patternEditorPattern = [];
+let patternEditorNewCycle = false;   // true in 'newCycle' mode (Set Cycle Start)
+function openPatternModal(mode) {
+    patternEditorNewCycle = (mode === 'newCycle');
+    if (mode === 'append' && !shiftSegments.length) {
         showPopup(document.getElementById('pattern-btn'), 'SET CYCLE START FIRST', 'anchor-popup');
         return;
     }
-    patternEditorPattern = shiftSegments[shiftSegments.length - 1].pattern.map(s => s.label);  // prefill from current pattern
+    // Prefill chips from the current (last) pattern, or 2-2-2 on first use.
+    patternEditorPattern = shiftSegments.length
+        ? shiftSegments[shiftSegments.length - 1].pattern.map(s => s.label)
+        : pattern222().map(s => s.label);
     document.getElementById('pattern-start-date').value = <today as YYYY-MM-DD>;
+    document.getElementById('pattern-start-help').innerHTML = patternEditorNewCycle
+        ? 'This date becomes your <strong>new cycle (anchor) start</strong> &mdash; your whole schedule is rebuilt from that day, using the pattern you pick below.'
+        : 'The new pattern applies <strong>from this date onward</strong>. Days before keep their old pattern &mdash; your history is never rewritten.';
     renderPatternEditor();
     document.getElementById('pattern-modal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -879,7 +872,7 @@ function closePatternEditor() {
     document.body.style.overflow = '';
 }
 ```
-- **Wiring:** `#pattern-btn` → open; `#pattern-close`, `#pattern-cancel`, `#pattern-backdrop` → close.
+- **Wiring:** `#pattern-btn` → `openPatternModal('append')`; `#set-cycle-btn` → `openPatternModal('newCycle')`; `#pattern-close`, `#pattern-cancel`, `#pattern-backdrop` → close.
 
 ### 9.1 `renderPatternEditor()`
 1. **Chips**: clear `#pattern-chips`; for each label in `patternEditorPattern` create a `<button type="button">` with classes `${CHIP_CLS[label]} border-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition hover:opacity-80`, text = label, `title = 'Tap to remove'`, click → remove that chip (`splice(i, 1)`) and re-render. If the array is empty, show a placeholder span: `'Build your pattern by tapping + M, + N, + OFF below'` with classes `text-xs text-gray-400 italic`.
@@ -898,13 +891,22 @@ function closePatternEditor() {
 Validation (each shows a popup on the save button and aborts):
 1. No start date → `showPopup(saveBtn, 'PICK A DATE', 'missed-popup')`.
 2. Empty pattern → `showPopup(saveBtn, 'PATTERN IS EMPTY', 'missed-popup')`.
+
+**New-cycle mode** (`patternEditorNewCycle === true`, opened by Set Cycle Start):
+- Reject a **future** anchor: if `sd > todayKey` → `showPopup(saveBtn, 'ANCHOR CANNOT BE IN THE FUTURE', 'missed-popup')`.
+- Else `shiftSegments = [{ startDate: sd, pattern: patternEditorPattern.map(makeShift) }]` (replaces ALL segments), sync anchor, `patternEditorNewCycle = false`, close, `renderCalendar()`, set `#set-cycle-btn` text to `'Change Cycle Start'` and `showPopup(setCycleBtn, 'ANCHOR SET ✓', 'anchor-popup')`.
+
+**Append mode** (opened by Shift Pattern):
 3. `sd < shiftSegments[0].startDate` (before anchor) → `showPopup(saveBtn, 'TOO EARLY', 'missed-popup')`.
 Then:
 - If `sd === shiftSegments[shiftSegments.length - 1].startDate` → **replace** the last segment's pattern.
 - Else → `shiftSegments.push({ startDate: sd, pattern: patternEditorPattern.map(makeShift) })` and **sort** by startDate (ascending).
+
+**Shared tail (both modes, after validation):**
 - `localStorage.setItem('shiftSegments', JSON.stringify(shiftSegments))`.
 - `savedAnchorDate = shiftSegments[0].startDate`; `localStorage.setItem('anchorDate', savedAnchorDate)`.
-- `closePatternEditor()`; `renderCalendar()`; `showPopup(document.getElementById('pattern-btn'), 'PATTERN SAVED ✓', 'anchor-popup')`.
+- `patternEditorNewCycle = false`; `closePatternEditor()`; `renderCalendar()`.
+- Append mode → `showPopup(document.getElementById('pattern-btn'), 'PATTERN SAVED ✓', 'anchor-popup')`.
 
 ---
 
@@ -915,13 +917,12 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 **Intro paragraph:**
 > This app helps you track your work attendance on a **shift pattern** &mdash; by default the classic **2-2-2** (2 morning shifts, 2 night shifts, then 2 days off, repeating every 6 days). You can keep that, or build any pattern you like (see section 9). Mark when you miss a day, track your streak, view attendance percentage, navigate with swipe gestures, export data as JSON or CSV, and manage everything offline in your browser.
 
-**1. Set Your Start Date**
-> Before anything else, you need to tell the app **when your cycle begins**.
+**1. Set Your Start Date &amp; Pattern**
+> Before anything else, you need to tell the app **when your cycle begins** and **which pattern** you work.
 > - Tap the **"Set Cycle Start"** button above the calendar.
-> - The button will change to **"Select Day Below..."**.
-> - Now tap any day on the calendar &mdash; that day becomes your **anchor date**.
-> - The calendar will instantly color-code every day based on your shift pattern.
-> *You can change your start date anytime by tapping "Change Cycle Start." You can also switch to a different shift pattern anytime &mdash; see section 9.*
+> - A dialog opens &mdash; pick your **start date** (this becomes your **anchor date**) and choose your **shift pattern** (preset or your own).
+> - Tap **Save Pattern** &mdash; the calendar will instantly color-code every day from that anchor on.
+> *You can change your start date and pattern together anytime by tapping "Change Cycle Start." You can also add a different pattern later without touching your history &mdash; see section 9.*
 
 **2. Understand the Colors** (each with a swatch: `inline-block w-10 h-10 rounded-lg` + matching classes)
 - `bg-amber-200 border-2 border-amber-400 shadow-sm` → **M (Morning)** — You work the morning shift
@@ -979,6 +980,7 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 
 **9. Use Your Own Shift Pattern**
 > Don&rsquo;t work a 2-2-2? No problem &mdash; the app works with **any** repeating pattern. Tap **"Shift Pattern"** above the calendar to open the pattern editor.
+> - The **first time**, just use **"Set Cycle Start"** instead &mdash; it opens the same dialog so you can pick your start date (anchor) and pattern together in one step.
 > - **Pick a preset** &mdash; e.g. 3M / 4OFF, 5M / 2OFF, 1-1-1, or 4M / 2OFF.
 > - Or **build your own** pattern chip by chip using the + M, + N and + OFF buttons. Tap a chip to remove it.
 > - Choose **when the pattern starts** &mdash; today, or any future date (e.g. your next roster change).
@@ -1005,13 +1007,13 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 
 ## 12. BUTTON/TOGGLE BEHAVIOR DETAILS
 
-- **`#set-cycle-btn`** (anchor flow):
+- **`#set-cycle-btn`** (new-cycle / anchor flow):
   - Initial text `Set Cycle Start`; if an anchor exists on load, text is `Change Cycle Start`.
-  - Click → `isSettingCycle = true`, text `Select Day Below...`, add classes `animate-pulse bg-red-100 text-red-600`; also remove `#friendly-banner` if present (it disappears as soon as cycle-setting starts).
-  - After a day is picked (§8.7), text returns to `Change Cycle Start` and pulse classes are removed.
+  - Click → `openPatternModal('newCycle')` (opens the pattern editor in new-cycle mode; no pulse, no tap-a-day step).
+  - After a new-cycle save (§9.4), text is set to `Change Cycle Start` and an `ANCHOR SET ✓` popup fires.
 - **Period arrows** → `periodOffset ± 1` + `renderCalendar()`.
 - **`#export-btn`** → `exportData`; **`#export-csv-btn`** → `exportCSV`; **`#import-btn`** → trigger click on hidden `#import-file-input`; `#import-file-input` `change` → `importData(file)` then reset input value; **`#reset-btn`** → `resetData`.
-- **`#pattern-btn`** → `openPatternEditor`.
+- **`#pattern-btn`** → `openPatternModal('append')`.
 
 ---
 
@@ -1019,10 +1021,10 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 
 1. Future days: rendered with muted styles and **not clickable** (guard `dt > today`).
 2. OFF days can never be marked missed (they still offer Paid + Copy Date via the dialog).
-3. No anchor + no cycle-setting mode → friendly banner AND plain day buttons both visible.
-4. Clicking "Set Cycle Start" hides the banner immediately (removes it) but does NOT re-render.
+3. No anchor → friendly banner AND plain day buttons both visible.
+4. Clicking "Set Cycle Start" opens the pattern editor in new-cycle mode (no tap-a-day step).
 5. Days before the anchor date still get shift labels (the pattern wraps backward around the first segment).
-6. Changing the anchor resets to a single segment reusing the current pattern — previous segments are dropped (history before the new anchor is recomputed from the new anchor).
+6. Saving a new cycle resets to a single segment using the chosen pattern — previous segments are dropped (history before the new anchor is recomputed from the new anchor). A future anchor date is rejected with an `ANCHOR CANNOT BE IN THE FUTURE` popup.
 7. Saving a pattern with the same start date as the last segment replaces that segment's pattern instead of adding a duplicate.
 8. A new pattern start date before the anchor is rejected with a `TOO EARLY` popup.
 9. Missed marks persist even across pattern changes.
@@ -1051,11 +1053,11 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 ## 15. ACCEPTANCE CRITERIA — verify ALL of these
 
 1. **Fresh start:** open the app with empty localStorage → friendly banner + `--` counters; all day buttons present and plain.
-2. **Set anchor:** click "Set Cycle Start" → button pulses and says "Select Day Below..."; banner disappears; tap a past day → calendar colors fill in (2-2-2), `ANCHOR ✓` popup, button now says "Change Cycle Start", heading shows "Month Year · Attendance".
+2. **Set anchor:** click "Set Cycle Start" → the pattern dialog opens in new-cycle mode (helper copy says the start date becomes the anchor; pre-filled 2-2-2 pattern). Pick a past/start date + pattern, tap **Save Pattern** → calendar colors fill in from that anchor, `ANCHOR SET ✓` popup, button now says "Change Cycle Start", heading shows "Month Year · Attendance". Reject a future anchor date with `ANCHOR CANNOT BE IN THE FUTURE`.
 3. **Colors:** verify M = amber, N = indigo, OFF = gray, MISSED = red; check the exact 6-day repeat and that the day BEFORE the anchor follows the pattern's last day.
 4. **Day-action dialog:** tap any past day → the dialog opens titled with the current voucher period. On an M/N day the drop-down offers Missed; tapping it marks the day red + `MISSED` popup. A missed day offers Unmiss → restores + `UNMISSED ✓` popup. OFF days offer Paid + Copy only. The dialog closes on Continue/Cancel/backdrop.
 5. **Stats:** counters match the grid; attendance % correct; streak shows 🔥 when ≥1.
-6. **Navigation:** arrows + swipe change period; date range and label update; tooltip on label click shows `M:N:OFF:Present:Missed` counts (only to today, and capped at the paid day if that period is paid).
+6. **Navigation:** arrows + swipe change period; date range and label update; tooltip on label click shows `M:N:OFF:Present:Missed` counts (only to today).
 7. **Copy:** tap a day → dialog → **Copy Date** → toast "Copied YYYY-MM-DD"; clipboard has the date.
 8. **Record payment:** tap a day → dialog → **Paid** → amount dialog subtitle shows the **previous voucher period** range ("for Jul 20 – Aug 19 · the previous voucher period"); enter an amount (e.g. 82850.43) → **Mark Paid** → day turns green **PAID** with a green `PAID ✓` popup, but the current period's present/missed/off counts are **unchanged** (the paid day still counts normally); the paid summary card appears with `₦82,850.43`, the **previous period** range (e.g. "for Jul 20 – Aug 19 · the previous voucher period"), and days-to-pay counted **inclusive of the pay day** (e.g. 36 for pay on 24 Aug). Opening that paid day's dialog again shows a single disabled `Already paid · ₦X` option. Navigating to a different (unpaid) period hides the summary.
 9. **Pattern editor:** opens with current pattern prefilled; presets replace chips; + M/N/OFF append; chip click removes; Delete last / Clear work; preview shows 14 chips starting at the chosen date; changing the date re-previews.
@@ -1075,4 +1077,4 @@ Sections are `<div>`s separated by `<hr class="border-gray-100">`. Headings use 
 - Output exactly **one file**: `index.html`. Do not create a README, CSS, or JS file.
 - Keep the exact element IDs listed here — the JavaScript depends on them.
 - Reproduce the WhatsApp icon with the standard WhatsApp brand SVG path (chat bubble glyph), `viewBox="0 0 24 24"`, `fill="currentColor"`, rendered at `w-3.5 h-3.5`.
-- The app must be a faithful clone of **v1.6.0** of the original. Do not add features beyond this spec, do not remove any.
+- The app must be a faithful clone of **v1.7.0** of the original. Do not add features beyond this spec, do not remove any.
